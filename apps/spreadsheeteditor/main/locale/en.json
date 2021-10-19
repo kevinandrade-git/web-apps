@@ -676,6 +676,7 @@
   "SSE.Controllers.Main.errorKeyExpire": "Key descriptor expired",
   "SSE.Controllers.Main.errorLabledColumnsPivot": "To create a pivot table, use data that is organized as a list with labeled columns.",
   "SSE.Controllers.Main.errorLoadingFont": "Fonts are not loaded.<br>Please contact your Document Server administrator.",
+  "SSE.Controllers.Main.errorUplImageUrlOnPaste": "We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.",
   "SSE.Controllers.Main.errorLocationOrDataRangeError": "The reference for the location or data range is not valid.",
   "SSE.Controllers.Main.errorLockedAll": "The operation could not be done as the sheet has been locked by another user.",
   "SSE.Controllers.Main.errorLockedCellPivot": "You cannot change data inside a pivot table.",

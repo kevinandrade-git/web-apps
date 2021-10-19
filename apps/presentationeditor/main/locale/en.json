@@ -405,6 +405,7 @@
   "PE.Controllers.Main.errorKeyEncrypt": "Unknown key descriptor",
   "PE.Controllers.Main.errorKeyExpire": "Key descriptor expired",
   "PE.Controllers.Main.errorLoadingFont": "Fonts are not loaded.<br>Please contact your Document Server administrator.",
+  "PE.Controllers.Main.errorUplImageUrlOnPaste": "We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.",
   "PE.Controllers.Main.errorProcessSaveResult": "Saving failed.",
   "PE.Controllers.Main.errorServerVersion": "The editor version has been updated. The page will be reloaded to apply the changes.",
   "PE.Controllers.Main.errorSessionAbsolute": "The document editing session has expired. Please reload the page.",

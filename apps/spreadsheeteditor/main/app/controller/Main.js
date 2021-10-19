@@ -1476,6 +1476,11 @@ define([
                 this.hidePreloader();
                 this.onLongActionEnd(Asc.c_oAscAsyncActionType.BlockInteraction, LoadingDocument);
 
+                if (id == Asc.c_oAscError.ID.UplImageUrlOnPaste) {
+                    this.showTips([this.errorUplImageUrlOnPaste]);
+                    return;
+                }
+
                 var config = {closable: true};
 
                 switch (id) {
@@ -3400,7 +3405,8 @@ define([
             uploadDocFileCountMessage: 'No documents uploaded.',
             errorLoadingFont: 'Fonts are not loaded.<br>Please contact your Document Server administrator.',
             textNeedSynchronize: 'You have an updates',
-            textChangesSaved: 'All changes saved'
+            textChangesSaved: 'All changes saved',
+            errorUplImageUrlOnPaste: 'We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.'
         }
     })(), SSE.Controllers.Main || {}))
 });

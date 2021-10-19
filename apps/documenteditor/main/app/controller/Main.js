@@ -1647,6 +1647,11 @@ define([
                 this.hidePreloader();
                 this.onLongActionEnd(Asc.c_oAscAsyncActionType['BlockInteraction'], LoadingDocument);
 
+                if (id == Asc.c_oAscError.ID.UplImageUrlOnPaste) {
+                    this.showTips([this.errorUplImageUrlOnPaste]);
+                    return;
+                }
+
                 var config = {
                     closable: true
                 };
@@ -3036,7 +3041,8 @@ define([
             txtTOCHeading: 'TOC Heading',
             textDisconnect: 'Connection is lost',
             errorLang: 'The interface language is not loaded.<br>Please contact your Document Server administrator.',
-            errorLoadingFont: 'Fonts are not loaded.<br>Please contact your Document Server administrator.'
+            errorLoadingFont: 'Fonts are not loaded.<br>Please contact your Document Server administrator.',
+            errorUplImageUrlOnPaste: 'We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.'
         }
     })(), DE.Controllers.Main || {}))
 });

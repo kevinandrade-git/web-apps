@@ -1329,6 +1329,11 @@ define([
                 this.hidePreloader();
                 this.onLongActionEnd(Asc.c_oAscAsyncActionType['BlockInteraction'], LoadingDocument);
 
+                if (id == Asc.c_oAscError.ID.UplImageUrlOnPaste) {
+                    this.showTips([this.errorUplImageUrlOnPaste]);
+                    return;
+                }
+
                 var config = {
                     closable: true
                 };
@@ -2832,7 +2837,8 @@ define([
             errorLoadingFont: 'Fonts are not loaded.<br>Please contact your Document Server administrator.',
             textConvertEquation: 'This equation was created with an old version of equation editor which is no longer supported. Converting this equation to Office Math ML format will make it editable.<br>Do you want to convert this equation?',
             textApplyAll: 'Apply to all equations',
-            textLearnMore: 'Learn More'
+            textLearnMore: 'Learn More',
+            errorUplImageUrlOnPaste: 'We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.'
         }
     })(), PE.Controllers.Main || {}))
 });

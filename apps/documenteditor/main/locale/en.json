@@ -531,6 +531,7 @@
   "DE.Controllers.Main.errorKeyEncrypt": "Unknown key descriptor",
   "DE.Controllers.Main.errorKeyExpire": "Key descriptor expired",
   "DE.Controllers.Main.errorLoadingFont": "Fonts are not loaded.<br>Please contact your Document Server administrator.",
+  "DE.Controllers.Main.errorUplImageUrlOnPaste": "We can’t paste this image from the Clipboard, but you can save it to your device and insert it from there, or you can copy the image without text and paste it into the document.",
   "DE.Controllers.Main.errorMailMergeLoadFile": "Loading the document failed. Please select a different file.",
   "DE.Controllers.Main.errorMailMergeSaveFile": "Merge failed.",
   "DE.Controllers.Main.errorProcessSaveResult": "Saving failed.",
