@@ -2120,8 +2120,8 @@ define([
                                         stopPropagation: true
                                     },
                                     {caption: '--'},
-                                    { template: _.template('<div id="id-toolbar-menu-bordercolor" style="width: 164px;display: inline-block;"></div>'), stopPropagation: true },
-                                    {caption: '--'},
+                                    { template: _.template('<div id="id-toolbar-menu-bordercolor" style="width: 164px;display: table-cell;"></div>'), stopPropagation: true },
+                                    // {caption: '--'},
                                     { template: _.template('<a id="id-toolbar-menu-new-bordercolor" style="padding-left:12px;">' + this.textNewColor + '</a>'),  stopPropagation: true }
                                 ]
                             })

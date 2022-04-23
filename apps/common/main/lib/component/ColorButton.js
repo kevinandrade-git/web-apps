@@ -99,8 +99,8 @@ define([
                     cls: 'shifted-left',
                     additionalAlign: options.additionalAlign,
                     items: (options.additionalItems ? options.additionalItems : []).concat(auto).concat([
-                        { template: _.template('<div id="' + id + '-color-menu" style="width: 164px; height:' + height + '; display: inline-block;"></div>') },
-                        {caption: '--'},
+                        { template: _.template('<div id="' + id + '-color-menu" style="width: 164px; height:' + height + '; display: table-cell;"></div>') },
+                        // {caption: '--'},
                         {
                             id: id + '-color-new',
                             template: _.template('<a tabindex="-1" type="menuitem" style="">' + this.textNewColor + '</a>')

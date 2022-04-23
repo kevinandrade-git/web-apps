@@ -54,7 +54,7 @@ define([
             themecolors: 10,
             columns: 10,
             effects: 5,
-            hideEmptyColors: false,
+            hideEmptyColors: true,
             allowReselect: true,
             transparent: false,
             value: '000000',
@@ -67,7 +67,8 @@ define([
                 '<div style="padding: 4px 0 0 12px;">' +
                 '<% var me = this; var idx = 0; %>' +
                 '<% $(colors).each(function(num, item) { %>' +
-                    '<% if (me.isBlankSeparator(item)) { %> <div class="palette-color-spacer" style="width:100%;height:8px;float:left;"></div>' +
+                    '<% if (me.isSpacer(item)) { %> <div class="palette-color-spacer" style="width:100%;height:8px;float:left;"></div>' +
+                    '<% } else if (me.isSmallSpacer(item)) { %> <div class="palette-color-spacer" style="width:100%;height:4px;float:left;"></div>' +
                     '<% } else if (me.isSeparator(item)) { %> </div><div class="divider" style="width:100%;float:left;"></div><div style="padding: 12px;">' +
                     '<% } else if (me.isColor(item)) { %> ' +
                         '<a class="palette-color color-<%=item%>" style="background:#<%=item%>" idx="<%=idx++%>">' +
@@ -91,12 +92,13 @@ define([
                 '</div>' +
                 '<% if (me.options.dynamiccolors!==undefined) { %>' +
                 '<div class="palette-color-dynamiccolors" style="padding: 4px 0 0 12px">' +
-                    '<div class="palette-color-spacer" style="width:100%;height:8px;float:left;"></div>' +
-                    '<div class="palette-color-caption" style="width:100%;float:left;font-size: 11px;"><%=me.textRecentColors%></div>' +
+                    '<div class="palette-color-spacer" style="width:100%;height:4px;float:left;"></div>' +
+                    // '<div class="palette-color-caption" style="width:100%;float:left;font-size: 11px;"><%=me.textRecentColors%></div>' +
                     '<% for (var i=0; i<me.options.dynamiccolors; i++) { %>' +
                         '<a class="color-dynamic-<%=i%> dynamic-empty-color <%= me.emptyColorsClass %>" color="" idx="<%=idx++%>">' +
                         '<em><span unselectable="on">&#160;</span></em></a>' +
                     '<% } %>' +
+                    '<div class="palette-color-spacer" style="width:100%;height:4px;float:left;"></div>' +
                 '<% } %>' +
                 '</div>'),
 
@@ -149,11 +151,14 @@ define([
             return this;
         },
 
-        isBlankSeparator: function(v) {
+        isSmallSpacer: function(v) {
             return typeof(v) == 'string' && v == '-';
         },
-        isSeparator: function(v) {
+        isSpacer: function(v) {
             return typeof(v) == 'string' && v == '--';
+        },
+        isSeparator: function(v) {
+            return typeof(v) == 'string' && v == '---';
         },
         isColor: function(v) {
             return typeof(v) == 'string' && (/[0-9A-F]{6}/).test(v);
@@ -162,7 +167,7 @@ define([
             return typeof(v) == 'string' && (v=='transparent');
         },
         isCaption: function(v) {
-            return (typeof(v) == 'string' && v!='-' && v!='--' && !(/[0-9A-F]{6}|transparent/).test(v));
+            return (typeof(v) == 'string' && v!='-' && v!='--' && v!='---' && !(/[0-9A-F]{6}|transparent/).test(v));
         },
         isEffect: function(v) {
             return (typeof(v) == 'object' && v.effectId !== undefined);
@@ -277,7 +282,7 @@ define([
                     this.updateCustomColors();
                     child = el.find('.color-dynamic-' + (this.options.dynamiccolors - 1));
                 } else {
-                    if (this.options.hideEmptyColors && this._layoutParams) // recalc indexed
+                    if (this.options.hideEmptyColors && this._layoutParams) // recalc indexes
                         this._layoutParams = undefined;
                 }
 
@@ -502,12 +507,12 @@ define([
                 for (var i=0; i<themecolors; i++)
                     arr.push({color: 'FFFFFF', effectId: 1});
 
-                if (effects>0) arr.push('-');
+                if (effects>0) arr.push('--');
                 for (var i=0; i<len; i++)
                     arr.push({color: 'FFFFFF', effectId: 1});
 
                 if (standardcolors)
-                    arr.push('-');
+                    arr.push('--');
             }
             if (standardcolors) {
                 arr.push(this.textStandartColors);
@@ -518,6 +523,7 @@ define([
                 for (var i=0; i<standardcolors; i++)
                     arr.push('FFFFFF');
             }
+            arr.push('-', '---');
             // if (this.options.dynamiccolors && (themecolors || standardcolors))
             //     arr.push('-', '--');
             return arr;
