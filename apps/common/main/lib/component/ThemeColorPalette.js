@@ -185,6 +185,7 @@ define([
                 if (color) { // custom color was selected
                     color = color.toUpperCase();
                     selected.removeClass(this.selectedCls);
+                    this.lastSelectedIdx = -1;
                 }
 
                 var colors = Common.localStorage.getItem('asc.'+Common.localStorage.getId()+'.colors.custom');
@@ -203,7 +204,15 @@ define([
                         color = undefined; //select only first found color
                     }
                 }
-
+                while (i < this.options.dynamiccolors) {
+                    colorEl = el.find('.color-dynamic-'+ i);
+                    colorEl.removeAttr('color');
+                    colorEl.addClass('dynamic-empty-color');
+                    colorEl.find('span').css({
+                        'background-color': 'transparent'
+                    });
+                    i++;
+                }
                 el.find('.palette-color-dynamiccolors').toggleClass(this.emptyColorsClass, c===0);
             }
         },
