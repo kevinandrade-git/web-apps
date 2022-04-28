@@ -192,6 +192,9 @@ define([
                 colors = colors ? colors.split(',') : [];
 
                 var i = -1, colorEl, c = colors.length < this.options.dynamiccolors ? colors.length : this.options.dynamiccolors;
+                if (this.options.hideEmptyColors && this._layoutParams && el.find('.dynamic-empty-color').length !== (this.options.dynamiccolors - c)) {// recalc indexed if change custom colors
+                    this._layoutParams = undefined;
+                }
                 while (++i < c) {
                     colorEl = el.find('.color-dynamic-'+ i);
                     colorEl.removeClass('dynamic-empty-color').removeClass(this.emptyColorsClass).attr('color', colors[i]);
