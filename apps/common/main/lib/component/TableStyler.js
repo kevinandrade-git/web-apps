@@ -368,7 +368,7 @@ define([
             defaultBorderColor  : '#ccc'
         },
 
-        template: _.template([
+        /*template: _.template([
             '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
                 '<div class="ts-preview-box ts-preview-box--lt" style="left: 0; top: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
                 '<div class="ts-preview-box ts-preview-box--mt" style="left: <%=scope.tablePadding%>px; top: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
@@ -432,6 +432,75 @@ define([
                 '</div>',
                 '<div class="ts-preview-box ts-preview-box--rb" style="bottom: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
             '</div>'
+        ].join('')),*/
+
+        template: _.template([
+            '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
+            '<canvas id="<%=scope.id%>-table-canvas"  width ="<%=scope.width * 2%>" height="<%=scope.height * 2%>" style="left: 0; top: 0; width: 100%; height: 100%;"></canvas>',
+            '</div>'
+    /*'<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;"></div>',
+    '<div class="ts-preview-box ts-preview-box--lt" style="left: 0; top: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
+    '<div class="ts-preview-box ts-preview-box--mt" style="left: <%=scope.tablePadding%>px; top: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
+    '<div id="<%=scope.id%>-table-top-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; top:  <%=scope.tablePadding * .5%>px;">',
+    '<table width="100%" height="100%">',
+    '<tr>',
+    '<td id="<%=scope.id%>-table-top-border" style="height:50%; border-bottom: <%=borderSize.top%>px solid <%borderColor.top.toHex()%>;"></td>',
+    '</tr>',
+    '<tr>',
+    '<td></td>',
+    '</tr>',
+    '</table>',
+    '</div>',
+    '</div>',
+    '<div class="ts-preview-box ts-preview-box--rt" style="top: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
+
+    '<div class="ts-preview-box ts-preview-box--lm" style="left: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
+    '<div id="<%=scope.id%>-table-left-border-selector" style="position: absolute; z-index: 1; left: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
+    '<table width="100%" height="100%">',
+    '<tr>',
+    '<td id="<%=scope.id%>-table-left-border" style="border-right: <%=borderSize.left%>px solid <%=borderColor.left.toHex()%>;"></td>',
+    '<td width="50%"></td>',
+    '</tr>',
+    '</table>',
+    '</div>',
+    '</div>',
+    '<div class="ts-preview-box ts-preview-box--mm" style="left: <%=scope.tablePadding%>px; top: <%=scope.tablePadding%>px; right: <%=scope.tablePadding%>px; bottom: <%=scope.tablePadding%>px;">',
+    '<table id="<%=scope.id%>-table-content" cols="<%=scope.columns%>" width="100%" height="100%" style="border-collapse: inherit; border-spacing: <%= scope.spacingMode ? scope.cellPadding : 0 %>px;">',
+    '<% for (var row = 0; row < scope.rows; row++) { %>',
+    '<tr>',
+    '<% for (var col = 0; col < scope.columns; col++) { %>',
+    '<td id="<%=scope.id%>-cell-container-<%=col%>-<%=row%>" class="content-box"></td>',
+    '<% } %>',
+    '</tr>',
+    '<% } %>',
+    '</table>',
+    '</div>',
+    '<div class="ts-preview-box ts-preview-box--rm" style="right: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
+    '<div id="<%=scope.id%>-table-right-border-selector" style="position: absolute; z-index: 1; right: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
+    '<table width="100%" height="100%">',
+    '<tr>',
+    '<td id="<%=scope.id%>-table-right-border" style="border-right: <%=borderSize.right%>px solid <%=borderColor.right.toHex()%>;"></td>',
+    '<td width="50%"></td>',
+    '</tr>',
+    '</table>',
+    '</div>',
+    '</div>',
+
+    '<div class="ts-preview-box ts-preview-box--lb" style="left: 0; bottom: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
+    '<div class="ts-preview-box ts-preview-box--mb" style="left: <%=scope.tablePadding%>px; bottom: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
+    '<div id="<%=scope.id%>-table-bottom-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; bottom:  <%=scope.tablePadding * .5%>px;">',
+    '<table width="100%" height="100%">',
+    '<tr>',
+    '<td id="<%=scope.id%>-table-bottom-border" style="height:50%; border-bottom: <%=borderSize.bottom%>px solid <%=borderColor.bottom.toHex()%>;"></td>',
+    '</tr>',
+    '<tr>',
+    '<td></td>',
+    '</tr>',
+    '</table>',
+    '</div>',
+    '</div>',
+    '<div class="ts-preview-box ts-preview-box--rb" style="bottom: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
+    '</div>'*/
         ].join('')),
 
         initialize : function(options) {
@@ -717,6 +786,7 @@ define([
             } else {
                 this.cmpEl = $(this.el);
             }
+            this.drawCanvas();
 
             if (!me.rendered) {
                 var el = this.cmpEl;
@@ -831,6 +901,127 @@ define([
 
             return this;
         },
+
+        drawCanvas: function ()
+        {
+            var me = this;
+            var canv = $('#' + me.id + '-table-canvas')[0], scale =2;
+            var sizeCorner =10*scale, tdPadding = 6 * scale;
+            var canvWidth = me.width*scale, tdWidth =(canvWidth-2*sizeCorner)/me.columns;
+            var canvHeight = me.height*scale, tdHeight=(canvHeight-2*sizeCorner)/me.rows;
+
+            var context = canv.getContext('2d');
+            context.lineJoin = 'meter';
+
+            var  pattern;
+
+            context.setLineDash([]);
+            drawBorder('t');
+            drawBorder('b');
+            drawBorder('l');
+            drawBorder('r');
+
+
+            context.beginPath();
+            context.setLineDash([scale,scale]);
+            //pattern = context.createPattern(imgDot, "repeat");
+            context.moveTo(sizeCorner, 0);
+            context.lineTo(sizeCorner, sizeCorner +scale/2);
+            context.moveTo(0, sizeCorner);
+            context.lineTo(sizeCorner +scale/2, sizeCorner);
+            context.moveTo(canvWidth - sizeCorner, 0);
+            context.lineTo(canvWidth - sizeCorner, sizeCorner +scale/2);
+            context.moveTo(canvWidth, sizeCorner);
+            context.lineTo(canvWidth - sizeCorner -scale/2, sizeCorner);
+            context.moveTo(canvWidth - sizeCorner, canvHeight);
+            context.lineTo(canvWidth - sizeCorner, canvHeight - sizeCorner-scale/2);
+            context.moveTo(canvWidth, canvHeight - sizeCorner);
+            context.lineTo(canvWidth - sizeCorner-scale/2, canvHeight - sizeCorner);
+            context.moveTo(sizeCorner, canvHeight);
+            context.lineTo(sizeCorner, canvHeight - sizeCorner-scale/2);
+            context.moveTo(0, canvHeight - sizeCorner);
+            context.lineTo(sizeCorner+scale/2, canvHeight - sizeCorner);
+            context.lineWidth = scale;
+            context.strokeStyle = "grey";
+            context.stroke();
+           var tdX, tdY = sizeCorner;
+            context.beginPath();
+            //context.setLineDash([2*scale,2*scale]);
+            /*context.lineWidth = tdWidth- 2*tdPadding;*/
+
+            context.lineWidth = 0;
+
+            var img = new Image() ;
+            img.onload = function (){
+                pattern = context.createPattern(img, "repeat");
+                context.fillStyle = pattern;
+
+                for (var row = 0; row < me.rows; row++) {
+                    //tdX = sizeCorner + tdWidth/2;
+                    tdX = sizeCorner;
+                    for (var col = 0; col < me.columns; col++) {
+                        /*context.moveTo(tdX, tdY + tdPadding);
+                        context.lineTo(tdX, tdY + tdHeight - tdPadding,);*/
+                        context.fillRect(tdX+tdPadding, tdY + tdPadding, tdWidth - 2 *tdPadding,tdHeight - 2 *tdPadding);
+                        tdX += tdWidth;
+                    }
+                    tdY += tdHeight;
+                }
+
+            };
+            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAIAQMAAADk/cxGAAAABlBMVEVMaXHAwMBbbSKjAAAAAXRSTlMAQObYZgAAAA5JREFUeNpj+MAAgVAAAC0QA8HkpvUHAAAAAElFTkSuQmCC'; // full uri here
+            context.stroke();
+
+
+
+            function drawBorder  ( border){
+
+                context.lineWidth = me.getBorderSize(border);
+                context.lineWidth = 4;
+                if(context.lineWidth != 0) {
+                    var points = getLine(context.lineWidth, border);
+                    context.beginPath();
+                    context.strokeStyle = me.getBorderColor(border);
+                    context.moveTo(points.X1, points.Y1);
+                    context.lineTo(points.X2, points.Y2);
+                    context.stroke();
+                }
+            }
+            function  getLine(borderWidth, border ){
+                var linePoints={}, indent = sizeCorner + borderWidth/2;
+                switch (border){
+                    case 't':
+                        linePoints.X1 = sizeCorner;
+                        linePoints.Y1 = indent;
+                        linePoints.X2 = canvWidth - sizeCorner;
+                        linePoints.Y2 = indent;
+                        break;
+                    case 'b':
+                        linePoints.X1 = sizeCorner;
+                        linePoints.Y1 = canvHeight - indent;
+                        linePoints.X2 = canvWidth - sizeCorner;
+                        linePoints.Y2 = canvHeight - indent;
+                        break;
+                    case 'l':
+                        linePoints.X1 = indent;
+                        linePoints.Y1 = sizeCorner;
+                        linePoints.X2 = indent;
+                        linePoints.Y2 = canvHeight - sizeCorner;
+                        break;
+                    case 'r':
+                        linePoints.X1 = canvWidth  - indent;
+                        linePoints.Y1 = sizeCorner;
+                        linePoints.X2 = canvWidth - indent;
+                        linePoints.Y2 = canvHeight  - sizeCorner;
+                        break;
+                }
+                return linePoints;
+            }
+        },
+
+
+
+
 
         getCell: function(col, row){
             return _.findWhere(this._cells, {
