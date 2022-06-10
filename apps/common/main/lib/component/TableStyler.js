@@ -906,6 +906,7 @@ define([
         {
             var me = this;
             var canv = $('#' + me.id + '-table-canvas')[0], scale =2;
+            canv.onclick(canvasClick);
             var sizeCorner =10*scale, tdPadding = 6 * scale;
             var canvWidth = me.width*scale, tdWidth =(canvWidth-2*sizeCorner)/me.columns;
             var canvHeight = me.height*scale, tdHeight=(canvHeight-2*sizeCorner)/me.rows;
@@ -921,10 +922,8 @@ define([
             drawBorder('l');
             drawBorder('r');
 
-
             context.beginPath();
             context.setLineDash([scale,scale]);
-            //pattern = context.createPattern(imgDot, "repeat");
             context.moveTo(sizeCorner, 0);
             context.lineTo(sizeCorner, sizeCorner +scale/2);
             context.moveTo(0, sizeCorner);
@@ -944,7 +943,7 @@ define([
             context.lineWidth = scale;
             context.strokeStyle = "grey";
             context.stroke();
-           var tdX, tdY = sizeCorner;
+            var tdX, tdY = sizeCorner;
             context.beginPath();
             //context.setLineDash([2*scale,2*scale]);
             /*context.lineWidth = tdWidth- 2*tdPadding;*/
@@ -976,8 +975,7 @@ define([
 
             function drawBorder  ( border){
 
-                context.lineWidth = me.getBorderSize(border);
-                context.lineWidth = 4;
+                context.lineWidth = me.getBorderSize(border)*scale;
                 if(context.lineWidth != 0) {
                     var points = getLine(context.lineWidth, border);
                     context.beginPath();
@@ -1017,11 +1015,38 @@ define([
                 }
                 return linePoints;
             }
+            function canvasClick(e){
+                var mouseX=parseInt(e.clientX - e.offsetX);
+                var mouseY=parseInt(e.clientY - e.offsetY);
+                if(inRect('t', mouseX, mouseY))
+                {
+
+                }
+                else if(inRect('b', mouseX, mouseY))
+                {
+
+                }
+                else if(inRect('l', mouseX, mouseY))
+                {
+
+                }
+                else if(inRect('r', mouseX, mouseY))
+                {
+
+                }
+
+            }
+
+            function inRect(border,MX, MY) {
+                var line = me.getBorderSize(border)*scale;
+                var h = 5 * scale;
+                if (line.Y1 == line.Y2)
+                    return ((MX > line.X1 && MX < line.X2) && (MY > line.Y1 - h && MY < line.Y1 + h));
+                else
+                    return((MY > line.Y1 && MY < line.Y2) && (MX > line.X1 - h && MX < line.X1 + h));
+            }
+
         },
-
-
-
-
 
         getCell: function(col, row){
             return _.findWhere(this._cells, {
