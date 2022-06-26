@@ -45,6 +45,110 @@ define([
     'common/main/lib/component/BaseView'
 ], function () {
     'use strict';
+    Common.UI.CellBorder = function (options){
+        var me =this;
+        me.options = {
+            x1                  : 0,
+            y1                  : 0,
+            x2                  : 0,
+            y2                  : 0,
+            scale               : 2,
+            sizeCorner          : 10,
+            clickOffset         : 10,
+            overwriteStyle      : true,
+            maxBorderSize       : 6,
+            halfBorderSize      : false,
+            defaultBorderSize   : 1,
+            defaultBorderColor  : '#ccc'
+        };
+
+        for( var key in options) {
+            me.options[key] = options[key];
+        }
+
+        var virtualBorderSize,
+            virtualBorderColor,
+            borderSize,
+            borderColor,
+            borderAlfa;
+
+        me.id                   = me.options.id || Common.UI.getId();
+        me.clickOffset          = me.options.clickOffset;
+        me.overwriteStyle       = me.options.overwriteStyle;
+        me.maxBorderSize        = me.options.maxBorderSize;
+        me.halfBorderSize       = me.options.halfBorderSize;
+        me.defaultBorderSize    = me.options.defaultBorderSize;
+        me.defaultBorderColor   = me.options.defaultBorderColor;
+        me.col                  = me.options.col;
+        me.row                  = me.options.row;
+        me.X1                   = me.options.x1;
+        me.Y1                   = me.options.y1;
+        me.X2                   = me.options.x2;
+        me.Y2                   = me.options.y2;
+        me.scale                = me.options.scale;
+        me.context              = me.options.context;
+
+        virtualBorderSize       = me.defaultBorderSize;
+        virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
+        borderSize = virtualBorderSize;
+        borderColor = virtualBorderColor;
+        borderAlfa = 1;
+
+        me.setBordersSize = function (size) {
+            size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
+            borderSize = size;
+            borderAlfa = (size<1) ? 0.3 : 1;
+        };
+
+        me.setBordersColor = function( color) {
+            borderColor = new Common.Utils.RGBColor(color);
+        };
+
+        me.getBorderSize = function() {
+            return borderSize;
+        };
+
+        me.getBorderColor = function() {
+            return borderColor.toHex();
+        };
+
+        me.setVirtualBorderSize = function(size) {
+            virtualBorderSize = (size > this.maxBorderSize) ? this.maxBorderSize : size;
+        };
+
+        me.setVirtualBorderColor = function(color){
+            var newColor = new Common.Utils.RGBColor(color);
+
+            if (virtualBorderColor.isEqual(newColor))
+                return;
+
+            virtualBorderColor = newColor;
+        };
+
+        me.getVirtualBorderSize = function() {
+            return virtualBorderSize;
+        };
+
+        me.getVirtualBorderColor = function() {
+            return virtualBorderColor.toHex();
+        };
+
+        me.getLine = function (){
+            return {X1: me.X1, Y1: me.Y1, X2: me.X2, Y2: me.Y2};
+        };
+
+        me.drawBorder = function (){
+            me.context.lineWidth = me.getBorderSize();
+            me.context.beginPath();
+            me.context.strokeStyle = me.getBorderColor();
+            me.context.moveTo(me.X1 * me.scale, me.Y1 * me.scale);
+            me.context.lineTo(me.X2 * me.scale, me.Y2 * me.scale);
+            me.context.stroke();
+        };
+        me.redrowBorder = function (){
+
+        }
+    }
 
     Common.UI.CellStyler = Common.UI.BaseView.extend({
         options : {
@@ -349,10 +453,6 @@ define([
         }
     });
 
-
-
-
-
     Common.UI.TableStyler = Common.UI.BaseView.extend({
         options : {
             width               : 200,
@@ -365,7 +465,11 @@ define([
             maxBorderSize       : 6,
             spacingMode         : false,
             defaultBorderSize   : 1,
-            defaultBorderColor  : '#ccc'
+            defaultBorderColor  : '#ccc',
+            sizeConer           : 10,
+            scale               : 2,
+            row                 :-1,
+            col                 :-1
         },
 
         /*template: _.template([
@@ -438,69 +542,6 @@ define([
             '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
             '<canvas id="<%=scope.id%>-table-canvas"  width ="<%=scope.width * 2%>" height="<%=scope.height * 2%>" style="left: 0; top: 0; width: 100%; height: 100%;"></canvas>',
             '</div>'
-    /*'<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;"></div>',
-    '<div class="ts-preview-box ts-preview-box--lt" style="left: 0; top: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-    '<div class="ts-preview-box ts-preview-box--mt" style="left: <%=scope.tablePadding%>px; top: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
-    '<div id="<%=scope.id%>-table-top-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; top:  <%=scope.tablePadding * .5%>px;">',
-    '<table width="100%" height="100%">',
-    '<tr>',
-    '<td id="<%=scope.id%>-table-top-border" style="height:50%; border-bottom: <%=borderSize.top%>px solid <%borderColor.top.toHex()%>;"></td>',
-    '</tr>',
-    '<tr>',
-    '<td></td>',
-    '</tr>',
-    '</table>',
-    '</div>',
-    '</div>',
-    '<div class="ts-preview-box ts-preview-box--rt" style="top: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-
-    '<div class="ts-preview-box ts-preview-box--lm" style="left: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
-    '<div id="<%=scope.id%>-table-left-border-selector" style="position: absolute; z-index: 1; left: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
-    '<table width="100%" height="100%">',
-    '<tr>',
-    '<td id="<%=scope.id%>-table-left-border" style="border-right: <%=borderSize.left%>px solid <%=borderColor.left.toHex()%>;"></td>',
-    '<td width="50%"></td>',
-    '</tr>',
-    '</table>',
-    '</div>',
-    '</div>',
-    '<div class="ts-preview-box ts-preview-box--mm" style="left: <%=scope.tablePadding%>px; top: <%=scope.tablePadding%>px; right: <%=scope.tablePadding%>px; bottom: <%=scope.tablePadding%>px;">',
-    '<table id="<%=scope.id%>-table-content" cols="<%=scope.columns%>" width="100%" height="100%" style="border-collapse: inherit; border-spacing: <%= scope.spacingMode ? scope.cellPadding : 0 %>px;">',
-    '<% for (var row = 0; row < scope.rows; row++) { %>',
-    '<tr>',
-    '<% for (var col = 0; col < scope.columns; col++) { %>',
-    '<td id="<%=scope.id%>-cell-container-<%=col%>-<%=row%>" class="content-box"></td>',
-    '<% } %>',
-    '</tr>',
-    '<% } %>',
-    '</table>',
-    '</div>',
-    '<div class="ts-preview-box ts-preview-box--rm" style="right: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
-    '<div id="<%=scope.id%>-table-right-border-selector" style="position: absolute; z-index: 1; right: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
-    '<table width="100%" height="100%">',
-    '<tr>',
-    '<td id="<%=scope.id%>-table-right-border" style="border-right: <%=borderSize.right%>px solid <%=borderColor.right.toHex()%>;"></td>',
-    '<td width="50%"></td>',
-    '</tr>',
-    '</table>',
-    '</div>',
-    '</div>',
-
-    '<div class="ts-preview-box ts-preview-box--lb" style="left: 0; bottom: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-    '<div class="ts-preview-box ts-preview-box--mb" style="left: <%=scope.tablePadding%>px; bottom: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
-    '<div id="<%=scope.id%>-table-bottom-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; bottom:  <%=scope.tablePadding * .5%>px;">',
-    '<table width="100%" height="100%">',
-    '<tr>',
-    '<td id="<%=scope.id%>-table-bottom-border" style="height:50%; border-bottom: <%=borderSize.bottom%>px solid <%=borderColor.bottom.toHex()%>;"></td>',
-    '</tr>',
-    '<tr>',
-    '<td></td>',
-    '</tr>',
-    '</table>',
-    '</div>',
-    '</div>',
-    '<div class="ts-preview-box ts-preview-box--rb" style="bottom: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-    '</div>'*/
         ].join('')),
 
         initialize : function(options) {
@@ -525,6 +566,8 @@ define([
             me.spacingMode          = me.options.spacingMode;
             me.defaultBorderSize    = me.options.defaultBorderSize;
             me.defaultBorderColor   = me.options.defaultBorderColor;
+            me.sizeCorner           = me.options.sizeConer;
+            me.scale                = me.options.scale;
 
             virtualBorderSize       = (me.defaultBorderSize > me.maxBorderSize) ? me.maxBorderSize : me.defaultBorderSize;
             virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -631,6 +674,9 @@ define([
                     me.fireEvent('borderclick', me, 'b', borderSize.bottom, borderColor.bottom.toHex());
                 });
 
+                me.fireEvent('borderclick:cellborder', me,  borderSize, borderColor.top.toHex());
+                me.fireEvent('borderclick', me,  borderSize, borderColor.top.toHex());
+
                 leftBorderSelector.on('click', function(e){
                     if (me.overwriteStyle){
                         if (borderSize.left != virtualBorderSize || !borderColor.left.isEqual(virtualBorderColor)){
@@ -662,12 +708,8 @@ define([
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
 
                 virtualBorderSize = size;
-
-                for (var row = 0; row < me.rows; row++){
-                    for (var col = 0; col < me.columns; col++){
-                        var cell = me.getCell(col, row);
-                        cell.setVirtualBorderSize(size);
-                    }
+                for(var border =0; border < me._borders.length; border++){
+                    me._borders[border].setVirtualBorderSize(size);
                 }
             };
 
@@ -679,11 +721,8 @@ define([
 
                 virtualBorderColor = newColor;
 
-                for (var row = 0; row < me.rows; row++){
-                    for (var col = 0; col < me.columns; col++){
-                        var cell = me.getCell(col, row);
-                        cell.setVirtualBorderColor(virtualBorderColor.toHex());
-                    }
+                for(var border =0; border < me._borders.length; border++){
+                    me._borders[border].setVirtualBorderColor(virtualBorderColor.toHex());
                 }
             };
 
@@ -745,6 +784,52 @@ define([
                 return null;
             };
 
+            me.setBorderParams = function(border) {
+                var color = new Common.Utils.RGBColor(me.getBorderColor(border));
+                if(me.getBorderSize(border) == me.getVirtualBorderSize() && me.virtualBorderColor === color ){
+                    me.setBordersSize(border,0);
+                    return;
+                }
+                me.setBordersSize(border, me.getVirtualBorderSize());
+                me.setBordersColor(border,me.getVirtualBorderColor());
+            };
+
+
+            me.getLine =function  (borderWidth, border ){
+                var sizeCornerScale = me.sizeCorner * me.scale;
+                var linePoints={},
+                    indent = sizeCornerScale + borderWidth/2,
+                    canvWidth = me.width * me.scale,
+                    canvHeight =me.height * me.scale;
+                switch (border){
+                    case 't':
+                        linePoints.X1 = sizeCornerScale;
+                        linePoints.Y1 = indent;
+                        linePoints.X2 = canvWidth - sizeCornerScale;
+                        linePoints.Y2 = linePoints.Y1;
+                        break;
+                    case 'b':
+                        linePoints.X1 = sizeCornerScale;
+                        linePoints.Y1 = canvHeight - indent;
+                        linePoints.X2 = canvWidth - sizeCornerScale;
+                        linePoints.Y2 = linePoints.Y1;
+                        break;
+                    case 'l':
+                        linePoints.X1 = indent;
+                        linePoints.Y1 = sizeCornerScale;
+                        linePoints.X2 = linePoints.X1;
+                        linePoints.Y2 = canvHeight - sizeCornerScale;
+                        break;
+                    case 'r':
+                        linePoints.X1 = canvWidth  - indent;
+                        linePoints.Y1 = sizeCornerScale;
+                        linePoints.X2 = linePoints.X1;
+                        linePoints.Y2 = canvHeight  - sizeCornerScale;
+                        break;
+                }
+                return linePoints;
+            };
+
             me.setTableColor = function(color) {
                 table_content.toggleClass('transparent', color == 'transparent');
                 table_content.css('background-color', (color == 'transparent' ) ? color : ('#'+color));
@@ -768,7 +853,7 @@ define([
         render : function(parentEl) {
             var me = this,
                 cfg = arguments[1];
-
+            
             this.trigger('render:before', this);
 
             if (!me.rendered) {
@@ -786,112 +871,37 @@ define([
             } else {
                 this.cmpEl = $(this.el);
             }
+            me.canv = $('#' + me.id + '-table-canvas')[0];
             this.drawCanvas();
 
             if (!me.rendered) {
                 var el = this.cmpEl;
 
-                this._cells = [];
-
-                for (var row = 0; row < me.rows; row++) {
-                    for (var col = 0; col < me.columns; col++) {
-                        var cellStyler = new Common.UI.CellStyler({
-                            el                  : $('#' + me.id + '-cell-container-' + col + '-' + row),
-                            overwriteStyle      : me.overwriteStyle,
-                            halfBorderSize      : !me.spacingMode,
-                            defaultBorderSize   : me.spacingMode ? cfg.virtualBorderSize : 0,
-                            defaultBorderColor  : cfg.virtualBorderColor.toHex(),
-                            id                  : me.id + '-cell-' + col + '-' + row,
-                            col                 : col,
-                            row                 : row
-                        });
-
-                        this._cells.push(cellStyler);
-
-                        cellStyler.on('borderclick', function(cell, type, size, color){
-                            var cellCol, cellRow, curCell;
-                            if (type == 't'){
-                                if (cell.row > 0){
-                                    for(cellCol = 0; cellCol < me.columns; cellCol++){
-                                        curCell = me.getCell(cellCol, cell.row - 1);
-                                        curCell.setBordersSize('b', size);
-                                        curCell.setBordersColor('b', color);
-                                    }
-                                }
-
-                                for(cellCol = 0; cellCol < me.columns; cellCol++){
-                                    curCell = me.getCell(cellCol, cell.row);
-
-                                    if (cell.halfBorderSize && cell.row < 1)
-                                        curCell.setBordersSize('t', 0);
-                                    else
-                                        curCell.setBordersSize('t', size);
-
-                                    curCell.setBordersColor('t', color);
-                                }
-                            }
-                            else if (type == 'b'){
-                                if (cell.row < me.rows - 1){
-                                    for(cellCol = 0; cellCol < me.columns; cellCol++){
-                                        curCell = me.getCell(cellCol, cell.row + 1);
-                                        curCell.setBordersSize('t', size);
-                                        curCell.setBordersColor('t', color);
-                                    }
-                                }
-
-                                for(cellCol = 0; cellCol < me.columns; cellCol++){
-                                    curCell = me.getCell(cellCol, cell.row);
-
-                                    if (cell.halfBorderSize && cell.row >= me.rows - 1)
-                                        curCell.setBordersSize('b', 0);
-                                    else
-                                        curCell.setBordersSize('b', size);
-
-                                    curCell.setBordersColor('b', color);
-                                }
-                            }
-                            else if (type == 'l'){
-                                if (cell.col > 0){
-                                    for(cellRow = 0; cellRow < me.rows; cellRow++){
-                                        curCell = me.getCell(cell.col - 1, cellRow);
-                                        curCell.setBordersSize('r', size);
-                                        curCell.setBordersColor('r', color);
-                                    }
-                                }
-
-                                for(cellRow = 0; cellRow < me.rows; cellRow++){
-                                    curCell = me.getCell(cell.col, cellRow);
-
-                                    if (cell.halfBorderSize && cell.col < 1)
-                                        curCell.setBordersSize('l', 0);
-                                    else
-                                        curCell.setBordersSize('l', size);
-
-                                    curCell.setBordersColor('l', color);
-                                }
-                            }
-                            else if (type == 'r'){
-                                if (cell.col < me.columns - 1){
-                                    for(cellRow = 0; cellRow < me.rows; cellRow++){
-                                        curCell = me.getCell(cell.col + 1, cellRow);
-                                        curCell.setBordersSize('l', size);
-                                        curCell.setBordersColor('l', color);
-                                    }
-                                }
-
-                                for(cellRow = 0; cellRow < me.rows; cellRow++){
-                                    curCell = me.getCell(cell.col, cellRow);
-
-                                    if (cell.halfBorderSize && cell.col >= me.columns - 1)
-                                        curCell.setBordersSize('r', 0);
-                                    else
-                                        curCell.setBordersSize('r', size);
-
-                                    curCell.setBordersColor('r', color);
-                                }
-                            }
-                        });
-                    }
+                this._borders = [];
+                var hCorner = me.sizeCorner, cellBorder;
+                var stepX = me.canv.width- 2 * hCorner,
+                    stepY = me.canv.height - 2 * hCorner;
+                var opt = {
+                    scale   : me.scale,
+                    context : me.canv.getContext('2d')
+                };
+                for (var row = 0; row < me.rows - 1; row++) {
+                    opt.y1 = (row + 1) * stepY + hCorner;
+                    opt.y2 = opt.y1;
+                    opt.x1 = hCorner;
+                    opt.x2 = me.canv.width - hCorner;
+                    opt.row = row;
+                    cellBorder = new Common.UI.CellBorder(opt);
+                    this._borders.push(cellBorder);
+                }
+                for (var col = 0; col < me.columns - 1; col++) {
+                    opt.y1 = hCorner;
+                    opt.y2 = me.canv.height - hCorner;
+                    opt.x1 = (col + 1) * stepX + hCorner;
+                    opt.x2 = opt.x1;
+                    opt.col = col;
+                    cellBorder = new Common.UI.CellBorder(opt);
+                    this._borders.push(cellBorder);
                 }
             }
 
@@ -902,16 +912,15 @@ define([
             return this;
         },
 
-        drawCanvas: function ()
-        {
+        drawCanvas: function () {
             var me = this;
-            var canv = $('#' + me.id + '-table-canvas')[0], scale =2;
-            canv.onclick(canvasClick);
-            var sizeCorner =10*scale, tdPadding = 6 * scale;
-            var canvWidth = me.width*scale, tdWidth =(canvWidth-2*sizeCorner)/me.columns;
-            var canvHeight = me.height*scale, tdHeight=(canvHeight-2*sizeCorner)/me.rows;
+            
+            me.canv.addEventListener('click',canvasClick);
+            var sizeCornerScale =me.sizeCorner*me.scale, tdPadding = 6 * me.scale;
+            var canvWidth = me.width*me.scale, tdWidth =(canvWidth-2*sizeCornerScale)/me.columns;
+            var canvHeight = me.height*me.scale, tdHeight=(canvHeight-2*sizeCornerScale)/me.rows;
 
-            var context = canv.getContext('2d');
+            var context = me.canv.getContext('2d');
             context.lineJoin = 'meter';
 
             var  pattern;
@@ -923,29 +932,30 @@ define([
             drawBorder('r');
 
             context.beginPath();
-            context.setLineDash([scale,scale]);
-            context.moveTo(sizeCorner, 0);
-            context.lineTo(sizeCorner, sizeCorner +scale/2);
-            context.moveTo(0, sizeCorner);
-            context.lineTo(sizeCorner +scale/2, sizeCorner);
-            context.moveTo(canvWidth - sizeCorner, 0);
-            context.lineTo(canvWidth - sizeCorner, sizeCorner +scale/2);
-            context.moveTo(canvWidth, sizeCorner);
-            context.lineTo(canvWidth - sizeCorner -scale/2, sizeCorner);
-            context.moveTo(canvWidth - sizeCorner, canvHeight);
-            context.lineTo(canvWidth - sizeCorner, canvHeight - sizeCorner-scale/2);
-            context.moveTo(canvWidth, canvHeight - sizeCorner);
-            context.lineTo(canvWidth - sizeCorner-scale/2, canvHeight - sizeCorner);
-            context.moveTo(sizeCorner, canvHeight);
-            context.lineTo(sizeCorner, canvHeight - sizeCorner-scale/2);
-            context.moveTo(0, canvHeight - sizeCorner);
-            context.lineTo(sizeCorner+scale/2, canvHeight - sizeCorner);
-            context.lineWidth = scale;
+            context.setLineDash([me.scale,me.scale]);
+            context.moveTo(sizeCornerScale, 0);
+            context.lineTo(sizeCornerScale, sizeCornerScale +me.scale/2);
+            context.moveTo(0, sizeCornerScale);
+            context.lineTo(sizeCornerScale +me.scale/2, sizeCornerScale);
+            context.moveTo(canvWidth - sizeCornerScale, 0);
+            context.lineTo(canvWidth - sizeCornerScale, sizeCornerScale +me.scale/2);
+            context.moveTo(canvWidth, sizeCornerScale);
+            context.lineTo(canvWidth - sizeCornerScale -me.scale/2, sizeCornerScale);
+            context.moveTo(canvWidth - sizeCornerScale, canvHeight);
+            context.lineTo(canvWidth - sizeCornerScale, canvHeight - sizeCornerScale-me.scale/2);
+            context.moveTo(canvWidth, canvHeight - sizeCornerScale);
+            context.lineTo(canvWidth - sizeCornerScale-me.scale/2, canvHeight - sizeCornerScale);
+            context.moveTo(sizeCornerScale, canvHeight);
+            context.lineTo(sizeCornerScale, canvHeight - sizeCornerScale-me.scale/2);
+            context.moveTo(0, canvHeight - sizeCornerScale);
+            context.lineTo(sizeCornerScale+me.scale/2, canvHeight - sizeCornerScale);
+            context.lineWidth = me.scale;
             context.strokeStyle = "grey";
             context.stroke();
-            var tdX, tdY = sizeCorner;
+            context.setLineDash([]);
+            var tdX, tdY = sizeCornerScale;
             context.beginPath();
-            //context.setLineDash([2*scale,2*scale]);
+            //context.setLineDash([2*me.scale,2*me.scale]);
             /*context.lineWidth = tdWidth- 2*tdPadding;*/
 
             context.lineWidth = 0;
@@ -956,11 +966,8 @@ define([
                 context.fillStyle = pattern;
 
                 for (var row = 0; row < me.rows; row++) {
-                    //tdX = sizeCorner + tdWidth/2;
-                    tdX = sizeCorner;
+                    tdX = sizeCornerScale;
                     for (var col = 0; col < me.columns; col++) {
-                        /*context.moveTo(tdX, tdY + tdPadding);
-                        context.lineTo(tdX, tdY + tdHeight - tdPadding,);*/
                         context.fillRect(tdX+tdPadding, tdY + tdPadding, tdWidth - 2 *tdPadding,tdHeight - 2 *tdPadding);
                         tdX += tdWidth;
                     }
@@ -973,11 +980,10 @@ define([
 
 
 
-            function drawBorder  ( border){
-
-                context.lineWidth = me.getBorderSize(border)*scale;
+            function drawBorder  (border){
+                context.lineWidth = me.getBorderSize(border)*me.scale;
                 if(context.lineWidth != 0) {
-                    var points = getLine(context.lineWidth, border);
+                    var points = me.getLine(context.lineWidth, border);
                     context.beginPath();
                     context.strokeStyle = me.getBorderColor(border);
                     context.moveTo(points.X1, points.Y1);
@@ -985,73 +991,64 @@ define([
                     context.stroke();
                 }
             }
-            function  getLine(borderWidth, border ){
-                var linePoints={}, indent = sizeCorner + borderWidth/2;
-                switch (border){
-                    case 't':
-                        linePoints.X1 = sizeCorner;
-                        linePoints.Y1 = indent;
-                        linePoints.X2 = canvWidth - sizeCorner;
-                        linePoints.Y2 = indent;
-                        break;
-                    case 'b':
-                        linePoints.X1 = sizeCorner;
-                        linePoints.Y1 = canvHeight - indent;
-                        linePoints.X2 = canvWidth - sizeCorner;
-                        linePoints.Y2 = canvHeight - indent;
-                        break;
-                    case 'l':
-                        linePoints.X1 = indent;
-                        linePoints.Y1 = sizeCorner;
-                        linePoints.X2 = indent;
-                        linePoints.Y2 = canvHeight - sizeCorner;
-                        break;
-                    case 'r':
-                        linePoints.X1 = canvWidth  - indent;
-                        linePoints.Y1 = sizeCorner;
-                        linePoints.X2 = canvWidth - indent;
-                        linePoints.Y2 = canvHeight  - sizeCorner;
-                        break;
-                }
-                return linePoints;
-            }
-            function canvasClick(e){
-                var mouseX=parseInt(e.clientX - e.offsetX);
-                var mouseY=parseInt(e.clientY - e.offsetY);
-                if(inRect('t', mouseX, mouseY))
-                {
-
-                }
-                else if(inRect('b', mouseX, mouseY))
-                {
-
-                }
-                else if(inRect('l', mouseX, mouseY))
-                {
-
-                }
-                else if(inRect('r', mouseX, mouseY))
-                {
-
-                }
-
-            }
 
             function inRect(border,MX, MY) {
-                var line = me.getBorderSize(border)*scale;
-                var h = 5 * scale;
+                var h = 5;
+                var sizeBorder = me.getBorderSize(border)*me.scale;
+                var line = me.getLine(sizeBorder, border);
+                line = {X1: line.X1/me.scale, Y1: line.Y1/me.scale, X2: line.X2/me.scale, Y2: line.Y2/me.scale};
+
                 if (line.Y1 == line.Y2)
                     return ((MX > line.X1 && MX < line.X2) && (MY > line.Y1 - h && MY < line.Y1 + h));
                 else
                     return((MY > line.Y1 && MY < line.Y2) && (MX > line.X1 - h && MX < line.X1 + h));
             }
+            function redrowBorder(border){
+                var borderSize = me.getBorderSize(border)*me.scale;
+                var line = me.getLine(borderSize, border);
+                if(line.X1==line.X2){
+                    context.clearRect(line.X1  - borderSize/2 , line.Y1, borderSize, line.Y2-line.Y1);
+                }
+                else {
+                    context.clearRect(line.X1 , line.Y1  - borderSize/2, line.X2-line.X1, borderSize);
+                }
+                me.setBorderParams(border);
+                drawBorder(border);
+            }
+            function canvasClick(e){
+                var mouseX, mouseY;
+
+                if(e.offsetX) {
+                    mouseX = parseInt(e.offsetX * Common.Utils.zoom());
+                    mouseY = parseInt(e.offsetY * Common.Utils.zoom());
+                }
+                else if(e.layerX) {
+                    mouseX = e.originalEvent.layerX;
+                    mouseY = e.originalEvent.layerY;
+                }
+
+                if(inRect('t', mouseX, mouseY)) {
+                    redrowBorder('t');
+                }
+                else if(inRect('b', mouseX, mouseY)) {
+                    redrowBorder('b');
+                }
+                else if(inRect('l', mouseX, mouseY)) {
+                    redrowBorder('l');
+                }
+                else if(inRect('r', mouseX, mouseY)) {
+                    redrowBorder('r');
+                }
+            }
+
 
         },
 
-        getCell: function(col, row){
-            return _.findWhere(this._cells, {
-                id: this.id + '-cell-' + col + '-' + row
-            })
+        getBorder: function(row, col){
+            if(col<0)
+                return _.findWhere(this._borders, { row:  row});
+            else
+                return _.findWhere(this._borders, {col:  col});
         }
     });
 });

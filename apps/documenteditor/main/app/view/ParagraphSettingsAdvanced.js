@@ -996,16 +996,13 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
                     this.onBorderSizeSelect(this.cmbBorderSize, rec);
             }
 
-            for (var i=0; i<this.BordersImage.rows; i++) {
-                for (var j=0; j<this.BordersImage.columns; j++) {
-                    this.BordersImage.getCell(j, i).on('borderclick', function(ct, border, size, color){
-                        if (this.ChangedBorders===undefined) {
-                            this.ChangedBorders = new Asc.asc_CParagraphBorders();
-                        }
-                        this._UpdateCellBordersStyle(ct, border, size, color, this.Borders);
-                    }, this);
+            this.BordersImage.on('borderclick:cellborder', function(ct, border, size, color){
+                if (this.ChangedBorders===undefined) {
+                    this.ChangedBorders = new Asc.asc_CParagraphBorders();
                 }
-            }
+                this._UpdateCellBordersStyle(ct, border, size, color, this.Borders);
+            }, this);
+
             this.BordersImage.on('borderclick', function(ct, border, size, color){
                 if (this.ChangedBorders===undefined) {
                     this.ChangedBorders = new Asc.asc_CParagraphBorders();
@@ -1210,7 +1207,7 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
         _UpdateCellBordersStyle: function(ct, border, size, color, destination) {
             var updateBorders = destination;
 
-            if ( ct.col==0 && border.indexOf('l') > -1 ) {
+            /*if ( ct.col==0 && border.indexOf('l') > -1 ) {
                 updateBorders.put_Left(this._UpdateBorderStyle(updateBorders.get_Left(), (size>0)));
                 if (this.ChangedBorders) {
                     this.ChangedBorders.put_Left(new Asc.asc_CTextBorder(updateBorders.get_Left()));
@@ -1244,7 +1241,7 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
                 if (this.ChangedBorders) {
                     this.ChangedBorders.put_Between(new Asc.asc_CTextBorder(updateBorders.get_Between()));
                 }
-            }
+            }*/
         },
 
         _UpdateTableBordersStyle: function(ct, border, size, color, destination) {
@@ -1286,26 +1283,24 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
             this._UpdateBorder(this.Borders.get_Bottom(), 'b');
 
             if (this.Borders.get_Between() !== null) {
-                for (var i=0; i<this.BordersImage.columns; i++) {
-                    this._UpdateCellBorder(this.Borders.get_Between(), 'b', this.BordersImage.getCell(i, 0));
-                    this._UpdateCellBorder(this.Borders.get_Between(), 't', this.BordersImage.getCell(i, 1));
-                }
+                for (var i=0; i<this.BordersImage.rows-1; i++) {
+                    this._UpdateCellBorder(this.Borders.get_Between(),  this.BordersImage.getBorder(i, -1));                }
             }
 
             this.BordersImage.setVirtualBorderSize(oldSize.pxValue);
             this.BordersImage.setVirtualBorderColor((typeof(oldColor) == 'object') ? oldColor.color : oldColor);
         },
 
-        _UpdateCellBorder: function(BorderParam, borderName, cell){
+        _UpdateCellBorder: function(BorderParam,  cellBorder){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color() && 1 == BorderParam.get_Value()){
-                    cell.setBordersSize(borderName, this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                    cell.setBordersColor(borderName, 'rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
+                    cellBorder.setBordersSize( this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
+                    cellBorder.setBordersColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
                 } else
-                    cell.setBordersSize(borderName, 0);
+                    cellBorder.setBordersSize( 0);
             }
             else {
-                cell.setBordersSize(borderName, 0);
+                cellBorder.setBordersSize( 0);
             }
         },
 
