@@ -1164,6 +1164,7 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
             }
             var colorstr = (typeof(color) == 'object') ? color.color : color;
             this.BordersImage.setCellsColor(colorstr);
+            this.BordersImage.redrawTable();
         },
 
 

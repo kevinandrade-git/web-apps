@@ -595,6 +595,7 @@ define([
             me.defaultBorderColor   = me.options.defaultBorderColor;
             me.sizeCorner           = me.options.sizeConer;
             me.scale                = me.options.scale;
+            me.backgroundColor      = 'transparent';
 
             virtualBorderSize       = (me.defaultBorderSize > me.maxBorderSize) ? me.maxBorderSize : me.defaultBorderSize;
             virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -612,8 +613,6 @@ define([
                 bottom  : virtualBorderColor,
                 left    : virtualBorderColor
             };
-
-
 
             me.rendered             = false;
 
@@ -815,13 +814,11 @@ define([
             };
 
             me.setTableColor = function(color) {
-                /*table_content.toggleClass('transparent', color == 'transparent');
-                table_content.css('background-color', (color == 'transparent' ) ? color : ('#'+color));*/
+                me.backgroundColor = (color == 'transparent' ) ? color : ('#'+color);
             };
 
             me.setCellsColor = function(color) {
-                /*!me.spacingMode && table_content.toggleClass('transparent', color == 'transparent');
-                cells_content.css('background-color', (color == 'transparent' ) ? color : ('#'+color));*/
+                me.backgroundColor = (color == 'transparent' ) ? color : ('#'+color);
             };
 
             if (me.options.el) {
@@ -968,6 +965,15 @@ define([
             var canvWidth = me.width * me.scale, tdWidth =(canvWidth -(me.getBorderSize('l') + me.getBorderSize('r')) * me.scale - 2*sizeCornerScale)/me.columns;
             var canvHeight = me.height * me.scale, tdHeight=(canvHeight - (me.getBorderSize('t') + me.getBorderSize('b')) * me.scale - 2*sizeCornerScale)/me.rows;
             var context = me.canv.getContext('2d');
+
+            if(me.backgroundColor != 'transparent' ){
+                context.beginPath();
+                context.fillStyle = me.backgroundColor;
+                context.fillRect(sizeCornerScale, sizeCornerScale, canvWidth - 2 * sizeCornerScale, canvHeight - 2 * sizeCornerScale);
+
+                context.stroke();
+            }
+
 
             context.setLineDash([]);
             me.drawBorder('t');
