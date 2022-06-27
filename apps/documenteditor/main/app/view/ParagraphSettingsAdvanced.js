@@ -1289,13 +1289,14 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
 
             this.BordersImage.setVirtualBorderSize(oldSize.pxValue);
             this.BordersImage.setVirtualBorderColor((typeof(oldColor) == 'object') ? oldColor.color : oldColor);
+            this.BordersImage.redrawTable();
         },
 
         _UpdateCellBorder: function(BorderParam,  cellBorder){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color() && 1 == BorderParam.get_Value()){
                     cellBorder.setBordersSize( this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                    cellBorder.setBordersColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
+                    cellBorder.setBordersColor(new Common.Utils.RGBColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')'));
                 } else
                     cellBorder.setBordersSize( 0);
             }
