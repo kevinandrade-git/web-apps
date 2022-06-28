@@ -975,11 +975,14 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
         },
 
         afterRender: function() {
-            this.updateMetricUnit();
-            this.updateThemeColors();
+
 
             this._setDefaults(this._originalProps);
-
+            var colorstr = (typeof(this.paragraphShade) == 'object') ? this.paragraphShade.color : this.paragraphShade;
+            this.BordersImage.setCellsColor(colorstr);
+            (colorstr!='transparent') &&this.BordersImage.redrawTable();
+            this.updateMetricUnit();
+            this.updateThemeColors();
             if (this.borderProps !== undefined) {
                 this.btnBorderColor.setColor(this.borderProps.borderColor);
                 this.btnBorderColor.setAutoColor(this.borderProps.borderColor=='auto');
@@ -1010,8 +1013,8 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
                 this._UpdateTableBordersStyle(ct, border, size, color, this.Borders);
             }, this);
 
-            var colorstr = (typeof(this.paragraphShade) == 'object') ? this.paragraphShade.color : this.paragraphShade;
-            this.BordersImage.setCellsColor(colorstr);
+
+
 
             if (this.storageName) {
                 var value = Common.localStorage.getItem(this.storageName);

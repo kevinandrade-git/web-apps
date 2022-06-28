@@ -1069,10 +1069,19 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
         },
 
         afterRender: function() {
-            this.updateMetricUnit();
-            this.updateThemeColors();
+
 
             this._setDefaults(this._originalProps);
+            var cellcolorstr = (typeof(this.CellColor.Color) == 'object') ? this.CellColor.Color.color : this.CellColor.Color,
+                tablecolorstr = (typeof(this.TableColor.Color) == 'object') ? this.TableColor.Color.color : this.TableColor.Color;
+            this.tableBordersImageSpacing.setTableColor(tablecolorstr);
+            this.tableBordersImage.setTableColor(tablecolorstr);
+            this.tableBordersImageSpacing.setCellsColor(cellcolorstr);
+            this.tableBordersImage.setCellsColor((this._allTable) ? tablecolorstr : cellcolorstr);
+            (colorstr!='transparent') && this.tableBordersImage.redrawTable();
+
+            this.updateMetricUnit();
+            this.updateThemeColors();
 
             if (this.borderProps !== undefined) {
                 this.btnBorderColor.setColor(this.borderProps.borderColor);
@@ -1122,12 +1131,7 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
             }, this);
 
 
-            var cellcolorstr = (typeof(this.CellColor.Color) == 'object') ? this.CellColor.Color.color : this.CellColor.Color,
-                tablecolorstr = (typeof(this.TableColor.Color) == 'object') ? this.TableColor.Color.color : this.TableColor.Color;
-            this.tableBordersImageSpacing.setTableColor(tablecolorstr);
-            this.tableBordersImage.setTableColor(tablecolorstr);
-            this.tableBordersImageSpacing.setCellsColor(cellcolorstr);
-            this.tableBordersImage.setCellsColor((this._allTable) ? tablecolorstr : cellcolorstr);
+
 
             if (this.storageName) {
                 var value = Common.localStorage.getItem(this.storageName);

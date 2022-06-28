@@ -668,14 +668,20 @@ define([
         },
 
         afterRender: function() {
-            this.updateMetricUnit();
-            this.updateThemeColors();
+
 
             if (!this.isFrame) {
                 this.cmbFonts.fillFonts(this.fontStore);
             }
 
             this._setDefaults(this._originalProps);
+
+            var colorstr = (typeof(this.paragraphShade) == 'object') ? this.paragraphShade.color : this.paragraphShade;
+            this.tableStyler.setCellsColor(colorstr);
+            (colorstr!='transparent') && this.tableStyler.redrawTable();
+
+            this.updateMetricUnit();
+            this.updateThemeColors();
 
             if (this.borderProps !== undefined) {
                 this.btnBorderColor.setColor(this.borderProps.borderColor);
@@ -707,8 +713,7 @@ define([
                 this._UpdateTableBordersStyle(ct, border, size, color, this.Borders);
             }, this);
 
-            var colorstr = (typeof(this.paragraphShade) == 'object') ? this.paragraphShade.color : this.paragraphShade;
-            this.tableStyler.setCellsColor(colorstr);
+
 
             if (this.isFrame)
                 this.setHeight(500);
