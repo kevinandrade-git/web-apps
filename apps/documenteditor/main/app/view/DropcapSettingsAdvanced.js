@@ -202,6 +202,7 @@ define([
                 }
                 var colorstr = (typeof(color) == 'object') ? color.color : color;
                 me.tableStyler.setCellsColor(colorstr);
+                me.tableStyler.redrawTable();
             }, this));
             this.colorsBack = this.btnBackColor.getPicker();
 
@@ -692,16 +693,13 @@ define([
 
             this.setTitle((this.isFrame) ? this.textTitleFrame : this.textTitle);
 
-            for (var i=0; i<this.tableStyler.rows; i++) {
-                for (var j=0; j<this.tableStyler.columns; j++) {
-                    this.tableStyler.getCell(j, i).on('borderclick', function(ct, border, size, color){
-                        if (this.ChangedBorders===undefined) {
-                            this.ChangedBorders = new Asc.asc_CParagraphBorders();
-                        }
-                        this._UpdateCellBordersStyle(ct, border, size, color, this.Borders);
-                    }, this);
+            this.tableStyler.on('borderclick:cellborder', function(ct, border, size, color){
+                if (this.ChangedBorders===undefined) {
+                    this.ChangedBorders = new Asc.asc_CParagraphBorders();
                 }
-            }
+                this._UpdateCellBordersStyle(ct, border, size, color, this.Borders);
+            }, this);
+
             this.tableStyler.on('borderclick', function(ct, border, size, color){
                 if (this.ChangedBorders===undefined) {
                     this.ChangedBorders = new Asc.asc_CParagraphBorders();
@@ -1041,26 +1039,26 @@ define([
             this._UpdateBorder(this.Borders.get_Bottom(), 'b');
 
             if (this.Borders.get_Between() !== null) {
-                for (var i=0; i<this.tableStyler.columns; i++) {
-                    this._UpdateCellBorder(this.Borders.get_Between(), 'b', this.tableStyler.getCell(i, 0));
-                    this._UpdateCellBorder(this.Borders.get_Between(), 't', this.tableStyler.getCell(i, 1));
+                for (var i=0; i<this.tableStyler.rows-1; i++) {
+                    this._UpdateCellBorder(this.Borders.get_Between(),  this.tableStyler.getBorder(i, -1));
                 }
             }
 
             this.tableStyler.setVirtualBorderSize(oldSize.pxValue);
             this.tableStyler.setVirtualBorderColor((typeof(oldColor) == 'object') ? oldColor.color : oldColor);
+            this.tableStyler.redrawTable();
         },
 
-        _UpdateCellBorder: function(BorderParam, borderName, cell){
+        _UpdateCellBorder: function(BorderParam,  cell){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color() && 1 == BorderParam.get_Value()){
-                    cell.setBordersSize(borderName, this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                    cell.setBordersColor(borderName, 'rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
+                    cell.setBordersSize(this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
+                    cell.setBordersColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
                 } else
-                    cell.setBordersSize(borderName, 0);
+                    cell.setBordersSize(0);
             }
             else {
-                cell.setBordersSize(borderName, 0);
+                cell.setBordersSize(0);
             }
         },
 

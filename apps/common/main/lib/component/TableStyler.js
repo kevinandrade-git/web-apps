@@ -101,7 +101,10 @@ define([
         };
 
         me.setBordersColor = function( color) {
-            borderColor = color;
+            var newColor = color;
+            if(typeof(color) == "string")
+                newColor = new Common.Utils.RGBColor(color);
+            borderColor = newColor;
         };
 
         me.getBorderSize = function() {

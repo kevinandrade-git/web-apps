@@ -1091,16 +1091,13 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                     this.onBorderSizeSelect(this.cmbBorderSize, rec);
             }
 
-            for (var i=0; i<this.tableBordersImageSpacing.rows; i++) {
-                for (var j=0; j<this.tableBordersImageSpacing.columns; j++) {
-                    this.tableBordersImageSpacing.getCell(j, i).on('borderclick', function(ct, border, size, color){
-                        if (this.ChangedCellBorders===undefined) {
-                            this.ChangedCellBorders = new Asc.CBorders();
-                        }
-                        this._UpdateCellBordersStyle(ct, border, size, color, this.CellBorders, this.ChangedCellBorders);
-                    }, this);
+            this.tableBordersImageSpacing.on('borderclick:cellborder', function(ct, border, size, color){
+                if (this.ChangedCellBorders===undefined) {
+                    this.ChangedCellBorders = new Asc.CBorders();
                 }
-            }
+                this._UpdateCellBordersStyle(ct, border, size, color, this.CellBorders, this.ChangedCellBorders);
+            }, this);
+
             this.tableBordersImageSpacing.on('borderclick', function(ct, border, size, color){
                 if (this.ChangedTableBorders===undefined) {
                     this.ChangedTableBorders = new Asc.CBorders();
@@ -1108,22 +1105,7 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 this._UpdateTableBordersStyle(ct, border, size, color, this.TableBorders, this.ChangedTableBorders);
             }, this);
 
-            for (i=0; i<this.tableBordersImage.rows; i++) {
-                for (j=0; j<this.tableBordersImage.columns; j++) {
-                    this.tableBordersImage.getCell(j, i).on('borderclick', function(ct, border, size, color){
-                        if (this._allTable) {
-                            if (this.ChangedTableBorders===undefined) {
-                                this.ChangedTableBorders = new Asc.CBorders();
-                            }
-                        } else {
-                            if (this.ChangedCellBorders===undefined) {
-                                this.ChangedCellBorders = new Asc.CBorders();
-                            }
-                        }
-                        this._UpdateCellBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
-                    }, this);
-                }
-            }
+
             this.tableBordersImage.on('borderclick', function(ct, border, size, color){
                 if (this._allTable) {
                     if (this.ChangedTableBorders===undefined) {
@@ -1134,8 +1116,11 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                         this.ChangedCellBorders = new Asc.CBorders();
                     }
                 }
+                this._UpdateCellBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
                 this._UpdateTableBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
+
             }, this);
+
 
             var cellcolorstr = (typeof(this.CellColor.Color) == 'object') ? this.CellColor.Color.color : this.CellColor.Color,
                 tablecolorstr = (typeof(this.TableColor.Color) == 'object') ? this.TableColor.Color.color : this.TableColor.Color;
@@ -1750,6 +1735,8 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
             this.tableBordersImageSpacing.setCellsColor(colorstr);
             if (!this._allTable)
                 this.tableBordersImage.setCellsColor(colorstr);
+
+
         },
 
         onColorsTableBackSelect: function(btn, color) {
@@ -1774,6 +1761,7 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
             this.tableBordersImage.setTableColor(colorstr);
             if (this._allTable)
                 this.tableBordersImage.setCellsColor(colorstr);
+            this.tableBordersImage.redrawTable();
         },
 
         _UpdateBordersSpacing_: function (){
@@ -1789,28 +1777,21 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
 
             source = this.CellBorders;
 
-            for (var i=0; i<this.tableBordersImageSpacing.rows; i++) {
-                this._UpdateCellBorderSpacing_(source.get_Left(), 'l', this.tableBordersImageSpacing.getCell(0, i));
+            for (var i=0; i<this.tableBordersImageSpacing.rows-1; i++) {
+                this._UpdateCellBorderSpacing_(source.get_Bottom(),  this.tableBordersImageSpacing.getBorder(i, -1));
             }
 
-            for (i=0; i<this.tableBordersImageSpacing.rows; i++) {
-                this._UpdateCellBorderSpacing_(source.get_Right(), 'r', this.tableBordersImageSpacing.getCell(this.tableBordersImageSpacing.columns-1, i));
+            for (i=0; i<this.tableBordersImageSpacing.columns-1; i++) {
+                this._UpdateCellBorderSpacing_(source.get_Right(), this.tableBordersImageSpacing.getBorder(-1, i));
             }
 
-            for (i=0; i<this.tableBordersImageSpacing.columns; i++) {
-                this._UpdateCellBorderSpacing_(source.get_Top(), 't', this.tableBordersImageSpacing.getCell(i, 0));
-            }
-
-            for (i=0; i<this.tableBordersImageSpacing.columns; i++) {
-                this._UpdateCellBorderSpacing_(source.get_Bottom(), 'b', this.tableBordersImageSpacing.getCell(i, this.tableBordersImageSpacing.rows-1));
-            }
             if (this._allTable && source.get_InsideV() === null) {
                 source.put_InsideV(new Asc.asc_CTextBorder());
             }
+
             if (source.get_InsideV() !== null) {
-                for (i=0; i<this.tableBordersImageSpacing.rows; i++) {
-                    this._UpdateCellBorderSpacing_(source.get_InsideV(), 'r', this.tableBordersImageSpacing.getCell(0, i));
-                    this._UpdateCellBorderSpacing_(source.get_InsideV(), 'l', this.tableBordersImageSpacing.getCell(1, i));
+                for (i=0; i<this.tableBordersImageSpacing.columns-1; i++) {
+                    this._UpdateCellBorderSpacing_(source.get_InsideV(),  this.tableBordersImageSpacing.getBorder(-1, -i));
                 }
             }
 
@@ -1818,27 +1799,28 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 source.put_InsideH(new Asc.asc_CTextBorder());
             }
             if (source.get_InsideH() !== null) {
-                for (i=0; i<this.tableBordersImageSpacing.columns; i++) {
-                    this._UpdateCellBorderSpacing_(source.get_InsideH(), 'b', this.tableBordersImageSpacing.getCell(i, 0));
-                    this._UpdateCellBorderSpacing_(source.get_InsideH(), 't', this.tableBordersImageSpacing.getCell(i, 1));
+                for (i=0; i<this.tableBordersImageSpacing.rows-1; i++) {
+                    this._UpdateCellBorderSpacing_(source.get_InsideH(), this.tableBordersImageSpacing.getBorder(i, -1));
                 }
             }
 
             this.tableBordersImageSpacing.setVirtualBorderSize(oldSize.pxValue);
             this.tableBordersImageSpacing.setVirtualBorderColor((typeof(oldColor) == 'object') ? oldColor.color : oldColor);
+
+            this.tableBordersImage.redrawTable();
         },
 
-        _UpdateCellBorderSpacing_: function(BorderParam, borderName, cell){
+        _UpdateCellBorderSpacing_: function(BorderParam, cell){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color()){
                     if (1 == BorderParam.get_Value()) {
-                        cell.setBordersSize(borderName, this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                        cell.setBordersColor(borderName, 'rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
+                        cell.setBordersSize(this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
+                        cell.setBordersColor(new Common.Utils.RGBColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')'));
                     } else
-                        cell.setBordersSize(borderName, 0);
+                        cell.setBordersSize(0);
                 } else {
-                    cell.setBordersSize(borderName, this.IndeterminateSize);
-                    cell.setBordersColor(borderName, this.IndeterminateColor);
+                    cell.setBordersSize(this.IndeterminateSize);
+                    cell.setBordersColor(this.IndeterminateColor);
                 }
             }
             else {
@@ -1881,9 +1863,8 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 source.put_InsideV(new Asc.asc_CTextBorder());
             }
             if (source.get_InsideV() !== null) {
-                for (var i=0; i<this.tableBordersImage.rows; i++) {
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideV(), 'r', this.tableBordersImage.getCell(0, i));
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideV(), 'l', this.tableBordersImage.getCell(1, i));
+                for (var i=0; i<this.tableBordersImage.rows-1; i++) {
+                    this._UpdateCellBorderNoSpacing_(source.get_InsideV(),  this.tableBordersImage.getBorder(i, -1));
                 }
             }
 
@@ -1891,9 +1872,8 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 source.put_InsideH(new Asc.asc_CTextBorder());
             }
             if (source.get_InsideH() !== null) {
-                for (i=0; i<this.tableBordersImage.columns; i++) {
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideH(), 'b', this.tableBordersImage.getCell(i, 0));
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideH(), 't', this.tableBordersImage.getCell(i, 1));
+                for (i=0; i<this.tableBordersImage.columns-1; i++) {
+                    this._UpdateCellBorderNoSpacing_(source.get_InsideH(),  this.tableBordersImage.getBorder(-1, i));
                 }
             }
 
@@ -1901,22 +1881,22 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
             this.tableBordersImage.setVirtualBorderColor((typeof(oldColor) == 'object') ? oldColor.color : oldColor);
         },
 
-        _UpdateCellBorderNoSpacing_: function(BorderParam, borderName, cell){
+        _UpdateCellBorderNoSpacing_: function(BorderParam,  cell){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color()){
                     if (1 == BorderParam.get_Value()) {
-                        cell.setBordersSize(borderName, this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                        cell.setBordersColor(borderName, 'rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
+                        cell.setBordersSize( this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
+                        cell.setBordersColor( 'rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')');
                     } else
-                        cell.setBordersSize(borderName, 0);
+                        cell.setBordersSize( 0);
                 } else {
-                    cell.setBordersSize(borderName, this.IndeterminateSize);
-                    cell.setBordersColor(borderName, this.IndeterminateColor);
+                    cell.setBordersSize( this.IndeterminateSize);
+                    cell.setBordersColor( this.IndeterminateColor);
                 }
             }
             else {
-                cell.setBordersSize(borderName, this.IndeterminateSize);
-                cell.setBordersColor(borderName, this.IndeterminateColor);
+                cell.setBordersSize( this.IndeterminateSize);
+                cell.setBordersColor( this.IndeterminateColor);
             }
         },
 
@@ -1983,6 +1963,8 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                     this._UpdateBorderStyle(updateBorders.get_InsideV(),    (cellborder.indexOf('c') > -1));
                     this._UpdateBorderStyle(updateBorders.get_InsideH(),    (cellborder.indexOf('m') > -1));
                 }
+
+                this.tableBordersImage.redrawTable();
                 return;
             }
 
