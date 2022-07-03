@@ -571,7 +571,7 @@ define([
 
         template: _.template([
             '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
-            '<canvas id="<%=scope.id%>-table-canvas"  width ="<%=scope.width * 2%>" height="<%=scope.height * 2%>" style="left: 0; top: 0; width: 100%; height: 100%;">' +
+            '<canvas id="<%=scope.id%>-table-canvas"  width ="<%=scope.width * scope.scale%>" height="<%=scope.height * scope.scale%>" style="left: 0; top: 0; width: 100%; height: 100%;">' +
             '<div class="ts-preview-box ts-preview-box--lt" style="left: 0; top: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>'+
             '</canvas>',
             '</div>'
@@ -787,30 +787,31 @@ define([
                     indent = sizeCornerScale + borderWidth/2,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
+                var diff = me.scale;
                 switch (border){
                     case 't':
-                        linePoints.X1 = sizeCornerScale;
-                        linePoints.Y1 = indent;
-                        linePoints.X2 = canvWidth - sizeCornerScale;
+                        linePoints.X1 = sizeCornerScale + diff;
+                        linePoints.Y1 = indent + diff;
+                        linePoints.X2 = canvWidth - sizeCornerScale - diff;
                         linePoints.Y2 = linePoints.Y1;
                         break;
                     case 'b':
-                        linePoints.X1 = sizeCornerScale;
-                        linePoints.Y1 = canvHeight - indent;
-                        linePoints.X2 = canvWidth - sizeCornerScale;
+                        linePoints.X1 = sizeCornerScale + diff;
+                        linePoints.Y1 = canvHeight - indent - diff;
+                        linePoints.X2 = canvWidth - sizeCornerScale - diff;
                         linePoints.Y2 = linePoints.Y1;
                         break;
                     case 'l':
-                        linePoints.X1 = indent;
-                        linePoints.Y1 = sizeCornerScale;
+                        linePoints.X1 = indent + diff;
+                        linePoints.Y1 = sizeCornerScale+diff;
                         linePoints.X2 = linePoints.X1;
-                        linePoints.Y2 = canvHeight - sizeCornerScale;
+                        linePoints.Y2 = canvHeight - sizeCornerScale - diff;
                         break;
                     case 'r':
-                        linePoints.X1 = canvWidth  - indent;
-                        linePoints.Y1 = sizeCornerScale;
+                        linePoints.X1 = canvWidth - indent - diff;
+                        linePoints.Y1 = sizeCornerScale + diff;
                         linePoints.X2 = linePoints.X1;
-                        linePoints.Y2 = canvHeight  - sizeCornerScale;
+                        linePoints.Y2 = canvHeight - sizeCornerScale - diff;
                         break;
                 }
                 return linePoints;
@@ -862,7 +863,7 @@ define([
                 var el = this.cmpEl;
 
                 this._borders = [];
-                var  cellBorder, opt;
+                var  cellBorder, opt, diff = me.scale;
                 var stepX = (me.canv.width- 2 * me.sizeCorner * me.scale)/me.columns,
                     stepY = (me.canv.height - 2 * me.sizeCorner * me.scale)/me.rows;
                 var generalOpt = {
@@ -873,8 +874,8 @@ define([
                     opt = generalOpt;
                     opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale;
                     opt.y2 = opt.y1;
-                    opt.x1 = me.sizeCorner  * me.scale;
-                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale;
+                    opt.x1 = me.sizeCorner  * me.scale + diff;
+                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale - diff;
                     opt.row = row;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
@@ -882,8 +883,8 @@ define([
 
                 for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
-                    opt.y1 = me.sizeCorner  * me.scale;
-                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale;
+                    opt.y1 = me.sizeCorner  * me.scale + diff;
+                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale - diff;
                     opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale;
                     opt.x2 = opt.x1;
                     opt.col = col;
@@ -911,24 +912,39 @@ define([
             var context = me.canv.getContext('2d');
             context.lineJoin = 'meter';
 
+            var diff = me.scale/2;
+
             context.beginPath();
             context.setLineDash([me.scale,me.scale]);
-            context.moveTo(sizeCornerScale, 0);
-            context.lineTo(sizeCornerScale, sizeCornerScale +me.scale/2);
-            context.moveTo(0, sizeCornerScale);
-            context.lineTo(sizeCornerScale +me.scale/2, sizeCornerScale);
-            context.moveTo(canvWidth - sizeCornerScale, 0);
-            context.lineTo(canvWidth - sizeCornerScale, sizeCornerScale +me.scale/2);
-            context.moveTo(canvWidth, sizeCornerScale);
-            context.lineTo(canvWidth - sizeCornerScale -me.scale/2, sizeCornerScale);
-            context.moveTo(canvWidth - sizeCornerScale, canvHeight);
-            context.lineTo(canvWidth - sizeCornerScale, canvHeight - sizeCornerScale-me.scale/2);
-            context.moveTo(canvWidth, canvHeight - sizeCornerScale);
-            context.lineTo(canvWidth - sizeCornerScale-me.scale/2, canvHeight - sizeCornerScale);
-            context.moveTo(sizeCornerScale, canvHeight);
-            context.lineTo(sizeCornerScale, canvHeight - sizeCornerScale-me.scale/2);
-            context.moveTo(0, canvHeight - sizeCornerScale);
-            context.lineTo(sizeCornerScale+me.scale/2, canvHeight - sizeCornerScale);
+
+            context.moveTo(sizeCornerScale + diff, 0);
+            context.lineTo(sizeCornerScale + diff, sizeCornerScale + me.scale);
+
+            context.moveTo(0, sizeCornerScale + diff);
+            context.lineTo(sizeCornerScale + me.scale/2, sizeCornerScale + diff);
+
+
+            context.moveTo(canvWidth - sizeCornerScale - diff, 0);
+            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale + me.scale/2);
+
+            context.moveTo(canvWidth, sizeCornerScale + diff);
+            context.lineTo(canvWidth - sizeCornerScale - me.scale/2, sizeCornerScale + diff);
+
+
+            context.moveTo(canvWidth - sizeCornerScale - diff, canvHeight);
+            context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale/2);
+
+            context.moveTo(canvWidth, canvHeight - sizeCornerScale - diff);
+            context.lineTo(canvWidth - sizeCornerScale - me.scale/2, canvHeight - sizeCornerScale - diff);
+
+
+            context.moveTo(sizeCornerScale + diff, canvHeight);
+            context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale/2);
+
+            context.moveTo(0, canvHeight - sizeCornerScale - diff);
+            context.lineTo(sizeCornerScale + me.scale/2, canvHeight - sizeCornerScale - diff);
+
+
             context.lineWidth = me.scale;
             context.strokeStyle = "grey";
             context.stroke();
@@ -963,20 +979,19 @@ define([
         },
 
         drawTable: function (){
-            var me = this;
-            var sizeCornerScale = me.sizeCorner * me.scale, tdPadding = 6 * me.scale;
-            var canvWidth = me.width * me.scale, tdWidth =(canvWidth -(me.getBorderSize('l') + me.getBorderSize('r')) * me.scale - 2*sizeCornerScale)/me.columns;
-            var canvHeight = me.height * me.scale, tdHeight=(canvHeight - (me.getBorderSize('t') + me.getBorderSize('b')) * me.scale - 2*sizeCornerScale)/me.rows;
-            var context = me.canv.getContext('2d');
+            var me = this, diff = me.scale/2;
+            var sizeCornerScale = me.sizeCorner * me.scale + diff, tdPadding = 6 * me.scale;
+            var tableWidth = me.width * me.scale - 2*sizeCornerScale,
+                tdWidth = tableWidth/me.columns,
+                tableHeight = me.height * me.scale - 2*sizeCornerScale, tdHeight = tableHeight/me.rows,
+                context = me.canv.getContext('2d');
 
             if(me.backgroundColor != 'transparent' ){
                 context.beginPath();
                 context.fillStyle = me.backgroundColor;
-                context.fillRect(sizeCornerScale, sizeCornerScale, canvWidth - 2 * sizeCornerScale, canvHeight - 2 * sizeCornerScale);
-
+                context.fillRect(sizeCornerScale, sizeCornerScale, tableWidth, tableHeight);
                 context.stroke();
             }
-
 
             context.setLineDash([]);
             me.drawBorder('t');
@@ -985,23 +1000,30 @@ define([
             me.drawBorder('r');
             context.lineWidth = 0;
 
-            var tdX, pattern, dopSpaceX = 0, dopSpaceY = 0,
-                tdY = sizeCornerScale + me.getBorderSize('t') * me.scale;
+
+
             context.beginPath();
             var img = new Image() ;
+
             img.onload = function (){
+                var tdX, tdY, pattern, widthRightBorder = 0, widthBottomBorder = 0, widthLeftBorder,
+                    yTop = sizeCornerScale, xLeft = sizeCornerScale,
+                    widthTopBorder = me.getBorderSize('t') * me.scale;
                 pattern = context.createPattern(img, "repeat");
                 context.fillStyle = pattern;
-
+                tdY = yTop;
                 for (var row = 0; row < me.rows; row++) {
-                    dopSpaceY = (row < me.rows-1) ? me.getBorder(row,-1).getBorderSize() * me.scale / 2 : 0;
-                    tdX = sizeCornerScale + me.getBorderSize('l') * me.scale;
+                    widthLeftBorder = me.getBorderSize('l') * me.scale;
+                    widthBottomBorder = (row < me.rows-1) ? me.getBorder(row,-1).getBorderSize() * me.scale  / 2 : me.getBorderSize('b') * me.scale;
+                    tdX = xLeft;
                     for (var col = 0; col < me.columns; col++) {
-                        dopSpaceX = (col < me.columns-1) ? me.getBorder(-1, col).getBorderSize() * me.scale / 2 : 0;
-                        context.fillRect(tdX + tdPadding, tdY + tdPadding, tdWidth - 2 * tdPadding - dopSpaceX,tdHeight - 2 *tdPadding - dopSpaceY);
-                        tdX += tdWidth + dopSpaceX;
+                        widthRightBorder = (col < me.columns-1) ? me.getBorder(-1, col).getBorderSize() * me.scale  / 2 : me.getBorderSize('r') * me.scale;
+                        context.fillRect(tdX + tdPadding + widthLeftBorder, tdY + tdPadding + widthTopBorder, tdWidth - (2 * tdPadding + widthLeftBorder + widthRightBorder),tdHeight - (2 * tdPadding + widthTopBorder + widthBottomBorder));
+                        tdX += tdWidth;
+                        widthLeftBorder = widthRightBorder;
                     }
-                    tdY += tdHeight + dopSpaceY ;
+                    tdY += tdHeight ;
+                    widthTopBorder  = widthBottomBorder;
                 }
             };
             img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAIAQMAAADk/cxGAAAABlBMVEVMaXHAwMBbbSKjAAAAAXRSTlMAQObYZgAAAA5JREFUeNpj+MAAgVAAAC0QA8HkpvUHAAAAAElFTkSuQmCC'; // full uri here
@@ -1035,8 +1057,8 @@ define([
 
         redrawTable: function() {
             var me = this;
-            var context = me.canv.getContext('2d');
-            context.clearRect(me.sizeCorner * me.scale, me.sizeCorner * me.scale, (me.width - 2*me.sizeCorner)*me.scale, (me.height - 2*me.sizeCorner)*me.scale);
+            var context = me.canv.getContext('2d'), diff = me.scale;
+            context.clearRect(me.sizeCorner * me.scale + diff, me.sizeCorner * me.scale + diff, (me.width - 2*me.sizeCorner)*me.scale - 2*diff, (me.height - 2*me.sizeCorner)*me.scale - 2*diff);
             me.drawTable();
         }
     });
