@@ -924,21 +924,21 @@ define([
 
 
             context.moveTo(canvWidth - sizeCornerScale - diff, 0);
-            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale + me.scale/2);
+            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale + me.scale);
 
             context.moveTo(canvWidth, sizeCornerScale + diff);
             context.lineTo(canvWidth - sizeCornerScale - me.scale/2, sizeCornerScale + diff);
 
 
             context.moveTo(canvWidth - sizeCornerScale - diff, canvHeight);
-            context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale/2);
+            context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale);
 
             context.moveTo(canvWidth, canvHeight - sizeCornerScale - diff);
             context.lineTo(canvWidth - sizeCornerScale - me.scale/2, canvHeight - sizeCornerScale - diff);
 
 
             context.moveTo(sizeCornerScale + diff, canvHeight);
-            context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale/2);
+            context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale);
 
             context.moveTo(0, canvHeight - sizeCornerScale - diff);
             context.lineTo(sizeCornerScale + me.scale/2, canvHeight - sizeCornerScale - diff);
