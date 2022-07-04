@@ -780,7 +780,6 @@ define([
                 me.setBordersColor(border,me.getVirtualBorderColor());
             };
 
-
             me.getLine =function  (borderWidth, border ){
                 var sizeCornerScale = me.sizeCorner * me.scale;
                 var linePoints={},
@@ -872,7 +871,7 @@ define([
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale;
+                    opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale+diff/2;
                     opt.y2 = opt.y1;
                     opt.x1 = me.sizeCorner  * me.scale + diff;
                     opt.x2 = me.canv.width - me.sizeCorner  * me.scale - diff;
@@ -885,7 +884,7 @@ define([
                     opt = generalOpt;
                     opt.y1 = me.sizeCorner  * me.scale + diff;
                     opt.y2 = me.canv.height - me.sizeCorner  * me.scale - diff;
-                    opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale;
+                    opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale +diff/2;
                     opt.x2 = opt.x1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
@@ -989,7 +988,7 @@ define([
             if(me.backgroundColor != 'transparent' ){
                 context.beginPath();
                 context.fillStyle = me.backgroundColor;
-                context.fillRect(sizeCornerScale, sizeCornerScale, tableWidth, tableHeight);
+                context.fillRect(sizeCornerScale + diff, sizeCornerScale + diff, tableWidth - 2 * diff, tableHeight - 2 * diff);
                 context.stroke();
             }
 
@@ -1038,10 +1037,10 @@ define([
             var borderSizeScale = me.getBorderSize(border) * me.scale;
             var line = me.getLine(borderSizeScale, border);
             if(line.X1==line.X2){
-                context.clearRect(line.X1  - borderSizeScale/2 , line.Y1, borderSizeScale, line.Y2-line.Y1);
+                context.clearRect(line.X1 - borderSizeScale/2 , line.Y1, borderSizeScale, line.Y2-line.Y1);
             }
             else {
-                context.clearRect(line.X1 , line.Y1  - borderSizeScale/2, line.X2-line.X1, borderSizeScale);
+                context.clearRect(line.X1 , line.Y1 - borderSizeScale/2, line.X2-line.X1, borderSizeScale);
             }
             me.setBorderParams(border);
             me.drawBorder(border);
