@@ -781,36 +781,38 @@ define([
             };
 
             me.getLine =function  (borderWidth, border ){
-                var sizeCornerScale = me.sizeCorner * me.scale;
+
+                var sizeCornerScale = me.sizeCorner * me.scale + 0.5*me.scale;
+
                 var linePoints={},
                     indent = sizeCornerScale + borderWidth/2,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
-                var diff = me.scale;
+
                 switch (border){
                     case 't':
-                        linePoints.X1 = sizeCornerScale + diff;
-                        linePoints.Y1 = indent + diff;
-                        linePoints.X2 = canvWidth - sizeCornerScale - diff;
+                        linePoints.X1 = sizeCornerScale;
+                        linePoints.Y1 = indent;
+                        linePoints.X2 = canvWidth - sizeCornerScale;
                         linePoints.Y2 = linePoints.Y1;
                         break;
                     case 'b':
-                        linePoints.X1 = sizeCornerScale + diff;
-                        linePoints.Y1 = canvHeight - indent - diff;
-                        linePoints.X2 = canvWidth - sizeCornerScale - diff;
+                        linePoints.X1 = sizeCornerScale;
+                        linePoints.Y1 = canvHeight - indent;
+                        linePoints.X2 = canvWidth - sizeCornerScale;
                         linePoints.Y2 = linePoints.Y1;
                         break;
                     case 'l':
-                        linePoints.X1 = indent + diff;
-                        linePoints.Y1 = sizeCornerScale+diff;
+                        linePoints.X1 = indent;
+                        linePoints.Y1 = sizeCornerScale;
                         linePoints.X2 = linePoints.X1;
-                        linePoints.Y2 = canvHeight - sizeCornerScale - diff;
+                        linePoints.Y2 = canvHeight - sizeCornerScale;
                         break;
                     case 'r':
-                        linePoints.X1 = canvWidth - indent - diff;
-                        linePoints.Y1 = sizeCornerScale + diff;
+                        linePoints.X1 = canvWidth - indent;
+                        linePoints.Y1 = sizeCornerScale;
                         linePoints.X2 = linePoints.X1;
-                        linePoints.Y2 = canvHeight - sizeCornerScale - diff;
+                        linePoints.Y2 = canvHeight - sizeCornerScale;
                         break;
                 }
                 return linePoints;
@@ -863,7 +865,7 @@ define([
 
                 this._borders = [];
                 var  cellBorder, opt, diff = me.scale;
-                var stepX = (me.canv.width- 2 * me.sizeCorner * me.scale)/me.columns,
+                var stepX = (me.canv.width - 2 * me.sizeCorner * me.scale)/me.columns,
                     stepY = (me.canv.height - 2 * me.sizeCorner * me.scale)/me.rows;
                 var generalOpt = {
                     scale   : me.scale,
@@ -871,7 +873,7 @@ define([
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale+diff/2;
+                    opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale - diff/4;
                     opt.y2 = opt.y1;
                     opt.x1 = me.sizeCorner  * me.scale + diff;
                     opt.x2 = me.canv.width - me.sizeCorner  * me.scale - diff;
@@ -884,13 +886,13 @@ define([
                     opt = generalOpt;
                     opt.y1 = me.sizeCorner  * me.scale + diff;
                     opt.y2 = me.canv.height - me.sizeCorner  * me.scale - diff;
-                    opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale +diff/2;
+                    opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale - diff/4;
                     opt.x2 = opt.x1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
                 }
-                this.drawCorners();
+                //this.drawCorners();
                 this.drawTable();
             }
 
@@ -967,6 +969,10 @@ define([
             var size = me.getBorderSize(border);
             if(size == 0) return;
             var context = me.canv.getContext('2d');
+            context.imageSmoothingEnabled = false;
+            context.mozImageSmoothingEnabled = false;
+            context.msImageSmoothingEnabled = false;
+            context.webkitImageSmoothingEnabled = false;
             context.lineWidth = size * me.scale;
             var points = me.getLine(context.lineWidth, border);
             context.beginPath();
@@ -978,6 +984,7 @@ define([
         },
 
         drawTable: function (){
+            this.drawCorners();
             var me = this, diff = me.scale/2;
             var sizeCornerScale = me.sizeCorner * me.scale + diff, tdPadding = 6 * me.scale;
             var tableWidth = me.width * me.scale - 2*sizeCornerScale,
@@ -1057,7 +1064,8 @@ define([
         redrawTable: function() {
             var me = this;
             var context = me.canv.getContext('2d'), diff = me.scale;
-            context.clearRect(me.sizeCorner * me.scale + diff, me.sizeCorner * me.scale + diff, (me.width - 2*me.sizeCorner)*me.scale - 2*diff, (me.height - 2*me.sizeCorner)*me.scale - 2*diff);
+            //context.clearRect(me.sizeCorner * me.scale + diff, me.sizeCorner * me.scale + diff, (me.width - 2*me.sizeCorner)*me.scale - 2*diff, (me.height - 2*me.sizeCorner)*me.scale - 2*diff);
+            context.clearRect(0,0, me.canv.width, me.canv.height);
             me.drawTable();
         }
     });
