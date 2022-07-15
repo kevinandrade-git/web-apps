@@ -599,6 +599,7 @@ define([
             me.sizeCorner           = me.options.sizeConer;
             me.scale                = me.options.scale;
             me.backgroundColor      = 'transparent';
+            me.ratio                = Common.Utils.zoom();
 
             virtualBorderSize       = (me.defaultBorderSize > me.maxBorderSize) ? me.maxBorderSize : me.defaultBorderSize;
             virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -781,17 +782,17 @@ define([
             };
 
             me.getLine =function  (borderWidth, border ){
-
-                var sizeCornerScale = me.sizeCorner * me.scale + 0.5*me.scale;
+                var diff = 2*me.scale;
+                var sizeCornerScale = me.sizeCorner * me.scale + diff;
 
                 var linePoints={},
-                    indent = sizeCornerScale + borderWidth/2,
+                    indent = sizeCornerScale + borderWidth/2 ,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
 
                 switch (border){
                     case 't':
-                        linePoints.X1 = sizeCornerScale;
+                        linePoints.X1 = sizeCornerScale ;
                         linePoints.Y1 = indent;
                         linePoints.X2 = canvWidth - sizeCornerScale;
                         linePoints.Y2 = linePoints.Y1;
@@ -859,7 +860,6 @@ define([
             }
             me.canv = $('#' + me.id + '-table-canvas')[0];
 
-
             if (!me.rendered) {
                 var el = this.cmpEl;
 
@@ -873,10 +873,10 @@ define([
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = (row + 1) * stepY + me.sizeCorner  * me.scale - diff/4;
+                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale)/4)*4 + diff/4;
                     opt.y2 = opt.y1;
-                    opt.x1 = me.sizeCorner  * me.scale + diff;
-                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale - diff;
+                    opt.x1 = me.sizeCorner  * me.scale + 2*diff;
+                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale -2*diff;
                     opt.row = row;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
@@ -884,9 +884,9 @@ define([
 
                 for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
-                    opt.y1 = me.sizeCorner  * me.scale + diff;
-                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale - diff;
-                    opt.x1 = (col + 1) * stepX + me.sizeCorner  * me.scale - diff/4;
+                    opt.y1 = me.sizeCorner  * me.scale +2*diff;
+                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale -2*diff;
+                    opt.x1 = Math.ceil((col + 1) * stepX + me.sizeCorner  * me.scale) - diff/2;
                     opt.x2 = opt.x1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
@@ -906,7 +906,7 @@ define([
 
         drawCorners: function () {
             var me = this;
-            var sizeCornerScale =me.sizeCorner*me.scale;
+            var sizeCornerScale =(me.sizeCorner+2)*me.scale;
             var canvWidth = me.width*me.scale;
             var canvHeight = me.height*me.scale;
 
@@ -919,31 +919,31 @@ define([
             context.setLineDash([me.scale,me.scale]);
 
             context.moveTo(sizeCornerScale + diff, 0);
-            context.lineTo(sizeCornerScale + diff, sizeCornerScale + me.scale);
+            context.lineTo(sizeCornerScale + diff, sizeCornerScale );
 
             context.moveTo(0, sizeCornerScale + diff);
-            context.lineTo(sizeCornerScale + me.scale/2, sizeCornerScale + diff);
+            context.lineTo(sizeCornerScale + me.scale, sizeCornerScale + diff);
 
 
             context.moveTo(canvWidth - sizeCornerScale - diff, 0);
-            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale + me.scale);
+            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale );
 
             context.moveTo(canvWidth, sizeCornerScale + diff);
-            context.lineTo(canvWidth - sizeCornerScale - me.scale/2, sizeCornerScale + diff);
+            context.lineTo(canvWidth - sizeCornerScale - me.scale, sizeCornerScale + diff);
 
 
             context.moveTo(canvWidth - sizeCornerScale - diff, canvHeight);
             context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale);
 
             context.moveTo(canvWidth, canvHeight - sizeCornerScale - diff);
-            context.lineTo(canvWidth - sizeCornerScale - me.scale/2, canvHeight - sizeCornerScale - diff);
+            context.lineTo(canvWidth - sizeCornerScale - me.scale, canvHeight - sizeCornerScale - diff);
 
 
             context.moveTo(sizeCornerScale + diff, canvHeight);
             context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale);
 
             context.moveTo(0, canvHeight - sizeCornerScale - diff);
-            context.lineTo(sizeCornerScale + me.scale/2, canvHeight - sizeCornerScale - diff);
+            context.lineTo(sizeCornerScale + me.scale, canvHeight - sizeCornerScale - diff);
 
 
             context.lineWidth = me.scale;
@@ -1005,8 +1005,6 @@ define([
             me.drawBorder('l');
             me.drawBorder('r');
             context.lineWidth = 0;
-
-
 
             context.beginPath();
             var img = new Image() ;
