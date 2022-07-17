@@ -87,6 +87,7 @@ define([
         me.Y2                   = me.options.y2;
         me.scale                = me.options.scale;
         me.context              = me.options.context;
+        me.diff                 = 0.5 * me.scale;
 
         virtualBorderSize       = me.defaultBorderSize;
         virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -96,6 +97,7 @@ define([
 
         me.setBordersSize = function (size) {
             size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
+            me.diff = 0.5 * me.scale;
             borderSize = size;
             borderAlfa = (size<1) ? 0.3 : 1;
         };
@@ -137,12 +139,16 @@ define([
         };
 
         me.getLine = function (){
-            return {X1: me.X1, Y1: me.Y1, X2: me.X2, Y2: me.Y2};
+            if (me.Y1 == me.Y2)
+                return {X1: me.X1, Y1: me.Y1 - me.diff, X2: me.X2, Y2: me.Y2- me.diff};
+            else
+                return {X1: me.X1 - me.diff, Y1: me.Y1, X2: me.X2 - me.diff, Y2: me.Y2};
         };
 
         me.inRect = function (MX, MY){
             var h = 5;
-            var line =  {X1: me.X1/me.scale, Y1: me.Y1/me.scale, X2: me.X2/me.scale, Y2: me.Y2/me.scale};
+            var line =  me.getLine();
+            line = {X1: line.X1/me.scale, Y1: line.Y1/me.scale, X2: line.X2/me.scale, Y2: line.Y2/me.scale};
 
             if (line.Y1 == line.Y2)
                 return ((MX > line.X1 && MX < line.X2) && (MY > line.Y1 - h && MY < line.Y1 + h));
@@ -152,12 +158,13 @@ define([
 
         me.drawBorder = function (){
             if(borderSize == 0) return;
+            var line =  me.getLine();
             me.context.beginPath();
             me.context.lineWidth = borderSize * me.scale;
             me.context.strokeStyle = me.getBorderColor();
 
-            me.context.moveTo(me.X1, me.Y1);
-            me.context.lineTo(me.X2, me.Y2);
+            me.context.moveTo(line.X1, line.Y1);
+            me.context.lineTo(line.X2, line.Y2);
             me.context.stroke();
         };
 
@@ -181,309 +188,6 @@ define([
         };
     }
 
-    Common.UI.CellStyler = Common.UI.BaseView.extend({
-        options : {
-            clickOffset         : 10,
-            overwriteStyle      : true,
-            maxBorderSize       : 6,
-            halfBorderSize      : false,
-            defaultBorderSize   : 1,
-            defaultBorderColor  : '#ccc'
-        },
-
-        template: _.template([
-            '<div id="<%=id%>" class="tablestyler-cell" style="">',
-                '<div class="cell-content" style="">',
-                    '<div class="content-text"></div>',
-                '</div>',
-            '</div>'
-        ].join('')),
-
-        initialize : function(options) {
-            Common.UI.BaseView.prototype.initialize.call(this, options);
-
-            var me = this,
-                divContent = undefined,
-                virtualBorderSize,
-                virtualBorderColor,
-                borderSize = {},
-                borderColor = {},
-                borderAlfa = {};
-
-            me.id                   = me.options.id || Common.UI.getId();
-            me.clickOffset          = me.options.clickOffset;
-            me.overwriteStyle       = me.options.overwriteStyle;
-            me.maxBorderSize        = me.options.maxBorderSize;
-            me.halfBorderSize       = me.options.halfBorderSize;
-            me.defaultBorderSize    = me.options.defaultBorderSize;
-            me.defaultBorderColor   = me.options.defaultBorderColor;
-            me.col                  = me.options.col;
-            me.row                  = me.options.row;
-
-            virtualBorderSize       = me.defaultBorderSize;
-            virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
-
-            borderSize = {
-                top     : virtualBorderSize,
-                right   : virtualBorderSize,
-                bottom  : virtualBorderSize,
-                left    : virtualBorderSize
-            };
-
-            borderColor = {
-                top     : virtualBorderColor,
-                right   : virtualBorderColor,
-                bottom  : virtualBorderColor,
-                left    : virtualBorderColor
-            };
-
-            borderAlfa = {
-                top     : 1,
-                right   : 1,
-                bottom  : 1,
-                left    : 1
-            };
-
-            me.rendered             = false;
-
-            var applyStyle = function(){
-                if (!_.isUndefined(divContent)){
-                    var brd = (borderSize.left>0.1 && borderSize.left<1) ? 1 : borderSize.left;
-                    var drawLeftSize = Math.abs((me.halfBorderSize) ? ((brd % 2) ? brd - 1: brd) * 0.5 : brd);
-
-                    brd = (borderSize.right>0.1 && borderSize.right<1) ? 1 : borderSize.right;
-                    var drawRightSize = Math.abs((me.halfBorderSize) ? ((brd % 2) ? brd + 1: brd) * 0.5 : brd);
-
-                    brd = (borderSize.top>0.1 && borderSize.top<1) ? 1 : borderSize.top;
-                    var drawTopSize = Math.abs((me.halfBorderSize) ? ((brd % 2) ? brd - 1: brd) * 0.5 : brd);
-
-                    brd = (borderSize.bottom>0.1 && borderSize.bottom<1) ? 1 : borderSize.bottom;
-                    var drawBottomSize = Math.abs((me.halfBorderSize) ? ((brd % 2) ? brd + 1: brd) * 0.5 : brd);
-
-                    var value =
-                        'inset ' +           ((drawLeftSize>0.1   && drawLeftSize<1)    ? 1 : drawLeftSize)   + 'px' + ' 0' + ' 0 ' + borderColor.left.toRGBA(borderAlfa.left) + ', ' +
-                        'inset ' +        -1*((drawRightSize>0.1  && drawRightSize<1)   ? 1 : drawRightSize)  + 'px' + ' 0' + ' 0 ' + borderColor.right.toRGBA(borderAlfa.right) + ', ' +
-                        'inset ' + '0 ' +    ((drawTopSize>0.1    && drawTopSize<1)     ? 1 : drawTopSize)    + 'px' + ' 0 '        + borderColor.top.toRGBA(borderAlfa.top) + ', ' +
-                        'inset ' + '0 ' + -1*((drawBottomSize>0.1 && drawBottomSize<1)  ? 1 : drawBottomSize) + 'px' + ' 0 '        + borderColor.bottom.toRGBA(borderAlfa.bottom);
-
-                    divContent.css('box-shadow', value);
-                }
-            };
-
-            me.on('render:after', function(cmp) {
-                if (this.cmpEl){
-                    divContent = this.cmpEl.find('.cell-content');
-
-                    applyStyle();
-                }
-
-                this.cmpEl.on('click', function(event){
-                    var pos = {
-                        x: event.pageX*Common.Utils.zoom() - me.cmpEl.offset().left,
-                        y: event.pageY*Common.Utils.zoom() - me.cmpEl.offset().top
-                    };
-
-                    var ptInPoly = function(npol, xp, yp, x, y) {
-                        var i, j, c = 0;
-                        for (i = 0, j = npol - 1; i < npol; j = i++){
-                            if ((((yp [i] <= y) && (y < yp [j])) || ((yp [j] <= y) && (y < yp [i]))) && (x < (xp [j] - xp [i]) * (y - yp [i]) / (yp [j] - yp [i]) + xp [i]))
-                                c = !c;
-                        }
-                        return c;
-                    };
-
-                    var meWidth = me.cmpEl.outerWidth();
-                    var meHeight = me.cmpEl.outerHeight();
-
-                    if (ptInPoly(4, [0, meWidth, meWidth-me.clickOffset, me.clickOffset], [0, 0, me.clickOffset, me.clickOffset], pos.x, pos.y)){
-                        if (me.overwriteStyle){
-                            if (borderSize.top != virtualBorderSize || !borderColor.top.isEqual(virtualBorderColor)){
-                                borderSize.top = virtualBorderSize;
-                                borderColor.top = virtualBorderColor;
-                                borderAlfa.top = (virtualBorderSize<1) ? 0.3 : 1;
-                            } else {
-                                borderSize.top = 0;
-                            }
-                        } else {
-                            borderSize.top = (borderSize.top > 0) ? 0 : virtualBorderSize;
-                            borderColor.top = virtualBorderColor;
-                        }
-
-                        me.fireEvent('borderclick', me, 't', borderSize.top, borderColor.top.toHex());
-
-                    } else if (ptInPoly(4, [meWidth, meWidth, meWidth-me.clickOffset, meWidth-me.clickOffset], [0, meHeight, meHeight-me.clickOffset, me.clickOffset], pos.x, pos.y)){
-                        if (me.overwriteStyle){
-                            if (borderSize.right != virtualBorderSize || !borderColor.right.isEqual(virtualBorderColor)){
-                                borderSize.right = virtualBorderSize;
-                                borderColor.right = virtualBorderColor;
-                                borderAlfa.right = (virtualBorderSize<1) ? 0.3 : 1;
-                            } else {
-                                borderSize.right = 0;
-                            }
-                        } else {
-                            borderSize.right = (borderSize.right > 0) ? 0 : virtualBorderSize;
-                            borderColor.right = virtualBorderColor;
-                        }
-
-                        me.fireEvent('borderclick', me, 'r', borderSize.right, borderColor.right.toHex());
-
-                    } else if (ptInPoly(4, [0, me.clickOffset, meWidth-me.clickOffset, meWidth], [meHeight, meHeight-me.clickOffset, meHeight-me.clickOffset, meHeight], pos.x, pos.y)){
-                        if (me.overwriteStyle){
-                            if (borderSize.bottom != virtualBorderSize || !borderColor.bottom.isEqual(virtualBorderColor)){
-                                borderSize.bottom = virtualBorderSize;
-                                borderColor.bottom = virtualBorderColor;
-                                borderAlfa.bottom = (virtualBorderSize<1) ? 0.3 : 1;
-                            } else {
-                                borderSize.bottom = 0;
-                            }
-                        } else {
-                            borderSize.bottom = (borderSize.bottom > 0) ? 0 : virtualBorderSize;
-                            borderColor.bottom = virtualBorderColor;
-                        }
-
-                        me.fireEvent('borderclick', me, 'b', borderSize.bottom, borderColor.bottom.toHex());
-
-                    } else if (ptInPoly(4, [0, me.clickOffset, me.clickOffset, 0], [0, me.clickOffset, meHeight-me.clickOffset, meHeight], pos.x, pos.y)){
-                        if (me.overwriteStyle){
-                            if (borderSize.left != virtualBorderSize || !borderColor.left.isEqual(virtualBorderColor)){
-                                borderSize.left = virtualBorderSize;
-                                borderColor.left = virtualBorderColor;
-                                borderAlfa.left = (virtualBorderSize<1) ? 0.3 : 1;
-                            } else {
-                                borderSize.left = 0;
-                            }
-                        } else {
-                            borderSize.left = (borderSize.left > 0) ? 0 : virtualBorderSize;
-                            borderColor.left = virtualBorderColor;
-                        }
-
-                        me.fireEvent('borderclick', me, 'l', borderSize.left, borderColor.left.toHex());
-                    }
-
-                    applyStyle();
-                });
-            });
-
-            me.setBordersSize = function(borders, size) {
-                size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
-
-                if (borders.indexOf('t') > -1) {
-                    borderSize.top = size;
-                    borderAlfa.top = (size<1) ? 0.3 : 1;
-                }
-                if (borders.indexOf('r') > -1) {
-                    borderSize.right = size;
-                    borderAlfa.right = (size<1) ? 0.3 : 1;
-                }
-                if (borders.indexOf('b') > -1) {
-                    borderSize.bottom = size;
-                    borderAlfa.bottom = (size<1) ? 0.3 : 1;
-                }
-                if (borders.indexOf('l') > -1) {
-                    borderSize.left = size;
-                    borderAlfa.left = (size<1) ? 0.3 : 1;
-                }
-
-                applyStyle();
-            };
-
-            me.setBordersColor = function(borders, color) {
-                var newColor = new Common.Utils.RGBColor(color);
-
-                if (borders.indexOf('t') > -1)
-                    borderColor.top = newColor;
-                if (borders.indexOf('r') > -1)
-                    borderColor.right = newColor;
-                if (borders.indexOf('b') > -1)
-                    borderColor.bottom = newColor;
-                if (borders.indexOf('l') > -1)
-                    borderColor.left = newColor;
-
-                applyStyle();
-            };
-
-            me.getBorderSize = function(border) {
-                switch(border){
-                    case 't':
-                        return borderSize.top;
-                    case 'r':
-                        return borderSize.right;
-                    case 'b':
-                        return borderSize.bottom;
-                    case 'l':
-                        return borderSize.left;
-                }
-                return null;
-            };
-
-            me.getBorderColor = function(border) {
-                switch(border){
-                    case 't':
-                        return borderColor.top.toHex();
-                    case 'r':
-                        return borderColor.right.toHex();
-                    case 'b':
-                        return borderColor.bottom.toHex();
-                    case 'l':
-                        return borderColor.left.toHex();
-                }
-                return null;
-            };
-
-            me.setVirtualBorderSize = function(size) {
-                virtualBorderSize = (size > this.maxBorderSize) ? this.maxBorderSize : size;
-            };
-
-            me.setVirtualBorderColor = function(color){
-                var newColor = new Common.Utils.RGBColor(color);
-
-                if (virtualBorderColor.isEqual(newColor))
-                    return;
-
-                virtualBorderColor = newColor;
-            };
-
-            me.getVirtualBorderSize = function() {
-                return virtualBorderSize;
-            };
-
-            me.getVirtualBorderColor = function() {
-                return virtualBorderColor.toHex();
-            };
-
-            if (me.options.el) {
-                me.render();
-            }
-        },
-
-        render : function(parentEl) {
-            var me = this;
-
-            this.trigger('render:before', this);
-
-            if (!me.rendered) {
-                this.cmpEl = $(this.template({
-                    id: this.id
-                }));
-
-                if (parentEl) {
-                    this.setElement(parentEl, false);
-                    parentEl.html(this.cmpEl);
-                } else {
-                    this.$el.html(this.cmpEl);
-                }
-            } else {
-                this.cmpEl = this.$el;
-            }
-
-            me.rendered = true;
-
-            this.trigger('render:after', this);
-
-            return this;
-        }
-    });
-
     Common.UI.TableStyler = Common.UI.BaseView.extend({
         options : {
             width               : 200,
@@ -502,72 +206,6 @@ define([
             row                 :-1,
             col                 :-1
         },
-
-        /*template: _.template([
-            '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
-                '<div class="ts-preview-box ts-preview-box--lt" style="left: 0; top: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-                '<div class="ts-preview-box ts-preview-box--mt" style="left: <%=scope.tablePadding%>px; top: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
-                    '<div id="<%=scope.id%>-table-top-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; top:  <%=scope.tablePadding * .5%>px;">',
-                        '<table width="100%" height="100%">',
-                            '<tr>',
-                                '<td id="<%=scope.id%>-table-top-border" style="height:50%; border-bottom: <%=borderSize.top%>px solid <%borderColor.top.toHex()%>;"></td>',
-                            '</tr>',
-                            '<tr>',
-                                '<td></td>',
-                            '</tr>',
-                        '</table>',
-                    '</div>',
-                '</div>',
-                '<div class="ts-preview-box ts-preview-box--rt" style="top: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-
-                '<div class="ts-preview-box ts-preview-box--lm" style="left: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
-                    '<div id="<%=scope.id%>-table-left-border-selector" style="position: absolute; z-index: 1; left: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
-                        '<table width="100%" height="100%">',
-                            '<tr>',
-                                '<td id="<%=scope.id%>-table-left-border" style="border-right: <%=borderSize.left%>px solid <%=borderColor.left.toHex()%>;"></td>',
-                                '<td width="50%"></td>',
-                            '</tr>',
-                        '</table>',
-                    '</div>',
-                '</div>',
-                '<div class="ts-preview-box ts-preview-box--mm" style="left: <%=scope.tablePadding%>px; top: <%=scope.tablePadding%>px; right: <%=scope.tablePadding%>px; bottom: <%=scope.tablePadding%>px;">',
-                    '<table id="<%=scope.id%>-table-content" cols="<%=scope.columns%>" width="100%" height="100%" style="border-collapse: inherit; border-spacing: <%= scope.spacingMode ? scope.cellPadding : 0 %>px;">',
-                        '<% for (var row = 0; row < scope.rows; row++) { %>',
-                            '<tr>',
-                                '<% for (var col = 0; col < scope.columns; col++) { %>',
-                                    '<td id="<%=scope.id%>-cell-container-<%=col%>-<%=row%>" class="content-box"></td>',
-                                '<% } %>',
-                            '</tr>',
-                        '<% } %>',
-                    '</table>',
-                '</div>',
-                '<div class="ts-preview-box ts-preview-box--rm" style="right: 0; top: <%=scope.tablePadding%>px; width: <%=scope.tablePadding%>px; height: <%=scope.height - 2 * scope.tablePadding%>px;">',
-                    '<div id="<%=scope.id%>-table-right-border-selector" style="position: absolute; z-index: 1; right: <%=scope.tablePadding * .5%>px; top: 0; bottom: 0; width: <%=scope.tablePadding%>px;">',
-                        '<table width="100%" height="100%">',
-                            '<tr>',
-                                '<td id="<%=scope.id%>-table-right-border" style="border-right: <%=borderSize.right%>px solid <%=borderColor.right.toHex()%>;"></td>',
-                                '<td width="50%"></td>',
-                            '</tr>',
-                        '</table>',
-                    '</div>',
-                '</div>',
-
-                '<div class="ts-preview-box ts-preview-box--lb" style="left: 0; bottom: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-                '<div class="ts-preview-box ts-preview-box--mb" style="left: <%=scope.tablePadding%>px; bottom: 0; right: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;">',
-                    '<div id="<%=scope.id%>-table-bottom-border-selector" style="position: absolute; z-index: 1; height: <%=scope.tablePadding%>px; left: 0; right: 0; bottom:  <%=scope.tablePadding * .5%>px;">',
-                        '<table width="100%" height="100%">',
-                            '<tr>',
-                                '<td id="<%=scope.id%>-table-bottom-border" style="height:50%; border-bottom: <%=borderSize.bottom%>px solid <%=borderColor.bottom.toHex()%>;"></td>',
-                            '</tr>',
-                            '<tr>',
-                                '<td></td>',
-                            '</tr>',
-                        '</table>',
-                    '</div>',
-                '</div>',
-                '<div class="ts-preview-box ts-preview-box--rb" style="bottom: 0; right: 0; width: <%=scope.tablePadding%>px; height: <%=scope.tablePadding%>px;"></div>',
-            '</div>'
-        ].join('')),*/
 
         template: _.template([
             '<div id="<%=scope.id%>" class="table-styler" style="position: relative; width: <%=scope.width%>px; height:<%=scope.height%>px;">',
@@ -596,7 +234,7 @@ define([
             me.spacingMode          = me.options.spacingMode;
             me.defaultBorderSize    = me.options.defaultBorderSize;
             me.defaultBorderColor   = me.options.defaultBorderColor;
-            me.sizeCorner           = me.options.sizeConer;
+            me.sizeCorner           = Math.ceil(me.options.sizeConer/4)*4;
             me.scale                = me.options.scale;
             me.backgroundColor      = 'transparent';
             me.ratio                = Common.Utils.zoom();
@@ -619,12 +257,6 @@ define([
             };
 
             me.rendered             = false;
-
-            var applyStyles = function(){
-
-            };
-
-
 
             me.on('render:after', function(cmp) {
 
@@ -739,7 +371,6 @@ define([
                 if (borders.indexOf('l') > -1)
                     borderColor.left = newColor;
 
-                //applyStyles();
             };
 
             me.getBorderSize = function(border){
@@ -783,7 +414,7 @@ define([
 
             me.getLine =function  (borderWidth, border ){
                 var diff = 2*me.scale;
-                var sizeCornerScale = me.sizeCorner * me.scale + diff;
+                var sizeCornerScale = me.sizeCorner * me.scale;
 
                 var linePoints={},
                     indent = sizeCornerScale + borderWidth/2 ,
@@ -862,7 +493,7 @@ define([
 
             if (!me.rendered) {
                 var el = this.cmpEl;
-
+                var dif
                 this._borders = [];
                 var  cellBorder, opt, diff = me.scale;
                 var stepX = (me.canv.width - 2 * me.sizeCorner * me.scale)/me.columns,
@@ -873,10 +504,10 @@ define([
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale)/4)*4 + diff/4;
+                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale));
                     opt.y2 = opt.y1;
-                    opt.x1 = me.sizeCorner  * me.scale + 2*diff;
-                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale -2*diff;
+                    opt.x1 = me.sizeCorner  * me.scale ;
+                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale ;
                     opt.row = row;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
@@ -884,9 +515,9 @@ define([
 
                 for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
-                    opt.y1 = me.sizeCorner  * me.scale +2*diff;
-                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale -2*diff;
-                    opt.x1 = Math.ceil((col + 1) * stepX + me.sizeCorner  * me.scale) - diff/2;
+                    opt.y1 = me.sizeCorner  * me.scale ;
+                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale;
+                    opt.x1 = Math.ceil(((col + 1) * stepX + me.sizeCorner  * me.scale)/4)*4;
                     opt.x2 = opt.x1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
@@ -906,7 +537,7 @@ define([
 
         drawCorners: function () {
             var me = this;
-            var sizeCornerScale =(me.sizeCorner+2)*me.scale;
+            var sizeCornerScale =me.sizeCorner*me.scale;
             var canvWidth = me.width*me.scale;
             var canvHeight = me.height*me.scale;
 
