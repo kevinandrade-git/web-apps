@@ -97,7 +97,7 @@ define([
 
         me.setBordersSize = function (size) {
             size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
-            me.diff = 0.5 * me.scale;
+            me.diff = (size == 0.5)?0.5 * me.scale*size:(size%2 ==0)?0:0.5*me.scale;
             borderSize = size;
             borderAlfa = (size<1) ? 0.3 : 1;
         };
@@ -140,7 +140,7 @@ define([
 
         me.getLine = function (){
             if (me.Y1 == me.Y2)
-                return {X1: me.X1, Y1: me.Y1 - me.diff, X2: me.X2, Y2: me.Y2- me.diff};
+                return {X1: me.X1, Y1: me.Y1 + me.diff, X2: me.X2 - me.diff, Y2: me.Y2+ me.diff};
             else
                 return {X1: me.X1 - me.diff, Y1: me.Y1, X2: me.X2 - me.diff, Y2: me.Y2};
         };
@@ -162,7 +162,6 @@ define([
             me.context.beginPath();
             me.context.lineWidth = borderSize * me.scale;
             me.context.strokeStyle = me.getBorderColor();
-
             me.context.moveTo(line.X1, line.Y1);
             me.context.lineTo(line.X2, line.Y2);
             me.context.stroke();
@@ -492,7 +491,7 @@ define([
             me.context = me.canv.getContext('2d');
             if (!me.rendered) {
                 this._borders = [];
-                var  cellBorder, opt, diff = me.scale;
+                var  cellBorder, opt;
                 var stepX = (me.canv.width - 2 * me.sizeCorner * me.scale)/me.columns,
                     stepY = (me.canv.height - 2 * me.sizeCorner * me.scale)/me.rows;
                 var generalOpt = {
@@ -501,7 +500,7 @@ define([
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale));
+                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale)/4)*4;
                     opt.y2 = opt.y1;
                     opt.x1 = me.sizeCorner  * me.scale ;
                     opt.x2 = me.canv.width - me.sizeCorner  * me.scale ;
@@ -692,7 +691,7 @@ define([
 
         redrawTable: function() {
             var me = this;
-            var context = me.canv.getContext('2d'), diff = me.scale;
+            var context = me.canv.getContext('2d');
             //context.clearRect(me.sizeCorner * me.scale + diff, me.sizeCorner * me.scale + diff, (me.width - 2*me.sizeCorner)*me.scale - 2*diff, (me.height - 2*me.sizeCorner)*me.scale - 2*diff);
             context.clearRect(0,0, me.canv.width, me.canv.height);
             me.drawTable();
