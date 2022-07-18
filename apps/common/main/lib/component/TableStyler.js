@@ -413,7 +413,6 @@ define([
             };
 
             me.getLine =function  (borderWidth, border ){
-                var diff = 2*me.scale;
                 var sizeCornerScale = me.sizeCorner * me.scale;
 
                 var linePoints={},
@@ -490,17 +489,15 @@ define([
                 this.cmpEl = $(this.el);
             }
             me.canv = $('#' + me.id + '-table-canvas')[0];
-
+            me.context = me.canv.getContext('2d');
             if (!me.rendered) {
-                var el = this.cmpEl;
-                var dif
                 this._borders = [];
                 var  cellBorder, opt, diff = me.scale;
                 var stepX = (me.canv.width - 2 * me.sizeCorner * me.scale)/me.columns,
                     stepY = (me.canv.height - 2 * me.sizeCorner * me.scale)/me.rows;
                 var generalOpt = {
                     scale   : me.scale,
-                    context : me.canv.getContext('2d')
+                    context : me.context
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
@@ -527,7 +524,6 @@ define([
                 this.drawTable();
             }
 
-
             me.rendered = true;
 
             this.trigger('render:after', this);
@@ -541,46 +537,45 @@ define([
             var canvWidth = me.width*me.scale;
             var canvHeight = me.height*me.scale;
 
-            var context = me.canv.getContext('2d');
-            context.lineJoin = 'meter';
+            me.context.lineJoin = 'meter';
 
             var diff = me.scale/2;
 
-            context.beginPath();
-            context.setLineDash([me.scale,me.scale]);
+            me.context.beginPath();
+            me.context.setLineDash([me.scale,me.scale]);
 
-            context.moveTo(sizeCornerScale + diff, 0);
-            context.lineTo(sizeCornerScale + diff, sizeCornerScale );
+            me.context.moveTo(sizeCornerScale + diff, 0);
+            me.context.lineTo(sizeCornerScale + diff, sizeCornerScale );
 
-            context.moveTo(0, sizeCornerScale + diff);
-            context.lineTo(sizeCornerScale + me.scale, sizeCornerScale + diff);
-
-
-            context.moveTo(canvWidth - sizeCornerScale - diff, 0);
-            context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale );
-
-            context.moveTo(canvWidth, sizeCornerScale + diff);
-            context.lineTo(canvWidth - sizeCornerScale - me.scale, sizeCornerScale + diff);
+            me.context.moveTo(0, sizeCornerScale + diff);
+            me.context.lineTo(sizeCornerScale + me.scale, sizeCornerScale + diff);
 
 
-            context.moveTo(canvWidth - sizeCornerScale - diff, canvHeight);
-            context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale);
+            me.context.moveTo(canvWidth - sizeCornerScale - diff, 0);
+            me.context.lineTo(canvWidth - sizeCornerScale - diff, sizeCornerScale );
 
-            context.moveTo(canvWidth, canvHeight - sizeCornerScale - diff);
-            context.lineTo(canvWidth - sizeCornerScale - me.scale, canvHeight - sizeCornerScale - diff);
-
-
-            context.moveTo(sizeCornerScale + diff, canvHeight);
-            context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale);
-
-            context.moveTo(0, canvHeight - sizeCornerScale - diff);
-            context.lineTo(sizeCornerScale + me.scale, canvHeight - sizeCornerScale - diff);
+            me.context.moveTo(canvWidth, sizeCornerScale + diff);
+            me.context.lineTo(canvWidth - sizeCornerScale - me.scale, sizeCornerScale + diff);
 
 
-            context.lineWidth = me.scale;
-            context.strokeStyle = "grey";
-            context.stroke();
-            context.setLineDash([]);
+            me.context.moveTo(canvWidth - sizeCornerScale - diff, canvHeight);
+            me.context.lineTo(canvWidth - sizeCornerScale - diff, canvHeight - sizeCornerScale - me.scale);
+
+            me.context.moveTo(canvWidth, canvHeight - sizeCornerScale - diff);
+            me.context.lineTo(canvWidth - sizeCornerScale - me.scale, canvHeight - sizeCornerScale - diff);
+
+
+            me.context.moveTo(sizeCornerScale + diff, canvHeight);
+            me.context.lineTo(sizeCornerScale + diff, canvHeight - sizeCornerScale - me.scale);
+
+            me.context.moveTo(0, canvHeight - sizeCornerScale - diff);
+            me.context.lineTo(sizeCornerScale + me.scale, canvHeight - sizeCornerScale - diff);
+
+
+            me.context.lineWidth = me.scale;
+            me.context.strokeStyle = "grey";
+            me.context.stroke();
+            me.context.setLineDash([]);
         },
 
         inRect: function(border,MX, MY) {
@@ -599,53 +594,58 @@ define([
             var me = this;
             var size = me.getBorderSize(border);
             if(size == 0) return;
-            var context = me.canv.getContext('2d');
-            context.imageSmoothingEnabled = false;
-            context.mozImageSmoothingEnabled = false;
-            context.msImageSmoothingEnabled = false;
-            context.webkitImageSmoothingEnabled = false;
-            context.lineWidth = size * me.scale;
-            var points = me.getLine(context.lineWidth, border);
-            context.beginPath();
-            context.strokeStyle = me.getBorderColor(border);
-            context.moveTo(points.X1, points.Y1);
-            context.lineTo(points.X2, points.Y2);
-            context.stroke();
+            me.context.imageSmoothingEnabled = false;
+            me.context.mozImageSmoothingEnabled = false;
+            me.context.msImageSmoothingEnabled = false;
+            me.context.webkitImageSmoothingEnabled = false;
+            me.context.lineWidth = size * me.scale;
+            var points = me.getLine(me.context.lineWidth, border);
+            me.context.beginPath();
+            me.context.strokeStyle = me.getBorderColor(border);
+            me.context.moveTo(points.X1, points.Y1);
+            me.context.lineTo(points.X2, points.Y2);
+            me.context.stroke();
 
         },
 
+
+
+
         drawTable: function (){
             this.drawCorners();
-            var me = this, diff = me.scale/2;
+
+            var me = this;
+
+            var diff = me.scale/2
             var sizeCornerScale = me.sizeCorner * me.scale + diff, tdPadding = 6 * me.scale;
             var tableWidth = me.width * me.scale - 2*sizeCornerScale,
                 tdWidth = tableWidth/me.columns,
-                tableHeight = me.height * me.scale - 2*sizeCornerScale, tdHeight = tableHeight/me.rows,
-                context = me.canv.getContext('2d');
+                tableHeight = me.height * me.scale - 2*sizeCornerScale, tdHeight = tableHeight/me.rows;
+
 
             if(me.backgroundColor != 'transparent' ){
-                context.beginPath();
-                context.fillStyle = me.backgroundColor;
-                context.fillRect(sizeCornerScale + diff, sizeCornerScale + diff, tableWidth - 2 * diff, tableHeight - 2 * diff);
-                context.stroke();
+                me.context.beginPath();
+                me.context.fillStyle = me.backgroundColor;
+                me.context.fillRect(sizeCornerScale + diff, sizeCornerScale + diff, tableWidth - 2 * diff, tableHeight - 2 * diff);
+                me.context.stroke();
             }
 
-            context.setLineDash([]);
+            me.context.setLineDash([]);
             me.drawBorder('t');
             me.drawBorder('b');
             me.drawBorder('l');
             me.drawBorder('r');
-            context.lineWidth = 0;
+            me.context.lineWidth = 0;
 
-            context.beginPath();
+            me.context.beginPath();
             var img = new Image() ;
 
             img.onload = function (){
                 var tdX, tdY, pattern, widthRightBorder = 0, widthBottomBorder = 0, widthLeftBorder,
                     yTop = sizeCornerScale, xLeft = sizeCornerScale,
                     widthTopBorder = me.getBorderSize('t') * me.scale;
-                pattern = context.createPattern(img, "repeat");
-                context.fillStyle = pattern;
+                pattern = me.context.createPattern(img, "repeat");
+                me.context.fillStyle = pattern;
                 tdY = yTop;
                 for (var row = 0; row < me.rows; row++) {
                     widthLeftBorder = me.getBorderSize('l') * me.scale;
@@ -653,16 +653,16 @@ define([
                     tdX = xLeft;
                     for (var col = 0; col < me.columns; col++) {
                         widthRightBorder = (col < me.columns-1) ? me.getBorder(-1, col).getBorderSize() * me.scale  / 2 : me.getBorderSize('r') * me.scale;
-                        context.fillRect(tdX + tdPadding + widthLeftBorder, tdY + tdPadding + widthTopBorder, tdWidth - (2 * tdPadding + widthLeftBorder + widthRightBorder),tdHeight - (2 * tdPadding + widthTopBorder + widthBottomBorder));
+                        me.context.fillRect(tdX + tdPadding + widthLeftBorder, tdY + tdPadding + widthTopBorder, tdWidth - (2 * tdPadding + widthLeftBorder + widthRightBorder),tdHeight - (2 * tdPadding + widthTopBorder + widthBottomBorder));
                         tdX += tdWidth;
                         widthLeftBorder = widthRightBorder;
                     }
-                    tdY += tdHeight ;
+                    tdY += tdHeight;
                     widthTopBorder  = widthBottomBorder;
                 }
             };
             img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAIAQMAAADk/cxGAAAABlBMVEVMaXHAwMBbbSKjAAAAAXRSTlMAQObYZgAAAA5JREFUeNpj+MAAgVAAAC0QA8HkpvUHAAAAAElFTkSuQmCC'; // full uri here
-            context.stroke();
+            me.context.stroke();
 
             me._borders.forEach(function (item){item.drawBorder();});
         },
