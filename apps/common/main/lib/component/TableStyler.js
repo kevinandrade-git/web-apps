@@ -59,7 +59,8 @@ define([
             maxBorderSize       : 6,
             halfBorderSize      : false,
             defaultBorderSize   : 1,
-            defaultBorderColor  : '#ccc'
+            defaultBorderColor  : '#ccc',
+            ratio               : 1
         };
 
         for( var key in options) {
@@ -88,6 +89,7 @@ define([
         me.scale                = me.options.scale;
         me.context              = me.options.context;
         me.diff                 = 0.5 * me.scale;
+        me.ratio                = me.options.ratio;
 
         virtualBorderSize       = me.defaultBorderSize;
         virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -97,9 +99,10 @@ define([
 
         me.setBordersSize = function (size) {
             size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
-            me.diff = (size == 0.5)?0.5 * me.scale*size:(size%2 ==0)?0:0.5*me.scale;
-            borderSize = size;
+            size = (size*me.ratio + 0.5)>>0;
             borderAlfa = (size<1) ? 0.3 : 1;
+            borderSize = (size+0.5)>>0;
+
         };
 
         me.setBordersColor = function( color) {
@@ -140,9 +143,19 @@ define([
 
         me.getLine = function (){
             if (me.Y1 == me.Y2)
-                return {X1: me.X1, Y1: me.Y1 + me.diff, X2: me.X2 - me.diff, Y2: me.Y2+ me.diff};
+                return {
+                    X1: me.X1 * me.scale,
+                    Y1: (((me.Y1 - borderSize/2)>>0) + borderSize/2) * me.scale,
+                    X2: me.X2 * me.scale,
+                    Y2: (((me.Y2 - borderSize/2)>>0) + borderSize/2) * me.scale
+                };
             else
-                return {X1: me.X1 - me.diff, Y1: me.Y1, X2: me.X2 - me.diff, Y2: me.Y2};
+                return {
+                    X1: (((me.X1 - borderSize/2)>>0) + me.scale*borderSize/2) * me.scale,
+                    Y1: me.Y1 * me.scale,
+                    X2: (((me.X2 - borderSize/2)>>0) + me.scale*borderSize/2) * me.scale,
+                    Y2: me.Y2 * me.scale
+                };
         };
 
         me.inRect = function (MX, MY){
@@ -236,7 +249,7 @@ define([
             me.sizeCorner           = Math.ceil(me.options.sizeConer/4)*4;
             me.scale                = me.options.scale;
             me.backgroundColor      = 'transparent';
-            me.ratio                = Common.Utils.zoom();
+            me.ratio                = Common.Utils.applicationPixelRatio();//1;//96/72;//
 
             virtualBorderSize       = (me.defaultBorderSize > me.maxBorderSize) ? me.maxBorderSize : me.defaultBorderSize;
             virtualBorderColor      = new Common.Utils.RGBColor(me.defaultBorderColor);
@@ -336,7 +349,7 @@ define([
 
             me.setBordersSize = function(borders, size){
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
-
+                size = (size>0.5)?((size*me.ratio + 0.5)>>0):size;
                 if (borders.indexOf('t') > -1) {
                     borderSize.top = size;
                     borderColor.top.toRGBA((borderSize.top < 1)   ? 0.2 : 1);
@@ -412,16 +425,15 @@ define([
             };
 
             me.getLine =function  (borderWidth, border ){
-                var sizeCornerScale = me.sizeCorner * me.scale;
-
+                var sizeCornerScale = (me.sizeCorner + 0) * me.scale ;
                 var linePoints={},
-                    indent = sizeCornerScale + borderWidth/2 ,
+                    indent = sizeCornerScale + me.scale*borderWidth/2,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
 
                 switch (border){
                     case 't':
-                        linePoints.X1 = sizeCornerScale ;
+                        linePoints.X1 = sizeCornerScale;
                         linePoints.Y1 = indent;
                         linePoints.X2 = canvWidth - sizeCornerScale;
                         linePoints.Y2 = linePoints.Y1;
@@ -489,21 +501,23 @@ define([
             }
             me.canv = $('#' + me.id + '-table-canvas')[0];
             me.context = me.canv.getContext('2d');
+            var sizeCorner =me.sizeCorner+1;
             if (!me.rendered) {
                 this._borders = [];
                 var  cellBorder, opt;
-                var stepX = (me.canv.width - 2 * me.sizeCorner * me.scale)/me.columns,
-                    stepY = (me.canv.height - 2 * me.sizeCorner * me.scale)/me.rows;
+                var stepX = (me.canv.width/me.scale - 2 * sizeCorner)/me.columns,
+                    stepY = (me.canv.height/me.scale - 2 * sizeCorner)/me.rows;
                 var generalOpt = {
                     scale   : me.scale,
-                    context : me.context
+                    context : me.context,
+                    ratio   : me.ratio
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
-                    opt.y1 = Math.ceil(((row + 1) * stepY + me.sizeCorner  * me.scale)/4)*4;
+                    opt.y1 = (row + 1) * stepY + sizeCorner;
                     opt.y2 = opt.y1;
-                    opt.x1 = me.sizeCorner  * me.scale ;
-                    opt.x2 = me.canv.width - me.sizeCorner  * me.scale ;
+                    opt.x1 = sizeCorner;
+                    opt.x2 = me.canv.width/me.scale - sizeCorner;
                     opt.row = row;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
@@ -511,9 +525,9 @@ define([
 
                 for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
-                    opt.y1 = me.sizeCorner  * me.scale ;
-                    opt.y2 = me.canv.height - me.sizeCorner  * me.scale;
-                    opt.x1 = Math.ceil(((col + 1) * stepX + me.sizeCorner  * me.scale)/4)*4;
+                    opt.y1 = sizeCorner;
+                    opt.y2 = me.canv.height - sizeCorner;
+                    opt.x1 = (col + 1) * stepX + sizeCorner;
                     opt.x2 = opt.x1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
@@ -579,7 +593,7 @@ define([
 
         inRect: function(border,MX, MY) {
             var h = 5;
-            var sizeBorder = this.getBorderSize(border)*this.scale;
+            var sizeBorder = this.getBorderSize(border);
             var line = this.getLine(sizeBorder, border);
             line = {X1: line.X1/this.scale, Y1: line.Y1/this.scale, X2: line.X2/this.scale, Y2: line.Y2/this.scale};
 
@@ -598,7 +612,7 @@ define([
             me.context.msImageSmoothingEnabled = false;
             me.context.webkitImageSmoothingEnabled = false;
             me.context.lineWidth = size * me.scale;
-            var points = me.getLine(me.context.lineWidth, border);
+            var points = me.getLine(size, border);
             me.context.beginPath();
             me.context.strokeStyle = me.getBorderColor(border);
             me.context.moveTo(points.X1, points.Y1);
@@ -669,8 +683,9 @@ define([
         redrawBorder: function(border){
             var me = this;
             var context = me.canv.getContext('2d');
-            var borderSizeScale = me.getBorderSize(border) * me.scale;
+            var borderSizeScale = me.getBorderSize(border) ;
             var line = me.getLine(borderSizeScale, border);
+            borderSizeScale *= me.scale;
             if(line.X1==line.X2){
                 context.clearRect(line.X1 - borderSizeScale/2 , line.Y1, borderSizeScale, line.Y2-line.Y1);
             }
