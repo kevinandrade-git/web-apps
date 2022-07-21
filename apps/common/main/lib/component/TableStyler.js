@@ -56,7 +56,7 @@ define([
             sizeCorner          : 10,
             clickOffset         : 10,
             overwriteStyle      : true,
-            maxBorderSize       : 6,
+            maxBorderSize       : 8,
             halfBorderSize      : false,
             defaultBorderSize   : 1,
             defaultBorderColor  : '#ccc',
@@ -99,7 +99,6 @@ define([
 
         me.setBordersSize = function (size) {
             size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
-            size = (size*me.ratio + 0.5)>>0;
             borderAlfa = (size<1) ? 0.3 : 1;
             borderSize = (size+0.5)>>0;
 
@@ -209,7 +208,7 @@ define([
             cellPadding         : 10,
             tablePadding        : 10,
             overwriteStyle      : true,
-            maxBorderSize       : 6,
+            maxBorderSize       : 8,
             spacingMode         : false,
             defaultBorderSize   : 1,
             defaultBorderColor  : '#ccc',
@@ -349,7 +348,6 @@ define([
 
             me.setBordersSize = function(borders, size){
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
-                size = (size>0.5)?((size*me.ratio + 0.5)>>0):size;
                 if (borders.indexOf('t') > -1) {
                     borderSize.top = size;
                     borderColor.top.toRGBA((borderSize.top < 1)   ? 0.2 : 1);
@@ -426,6 +424,7 @@ define([
 
             me.getLine =function  (borderWidth, border ){
                 var sizeCornerScale = (me.sizeCorner + 0) * me.scale ;
+
                 var linePoints={},
                     indent = sizeCornerScale + me.scale*borderWidth/2,
                     canvWidth = me.width * me.scale,
@@ -607,6 +606,7 @@ define([
             var me = this;
             var size = me.getBorderSize(border);
             if(size == 0) return;
+            if(Common.Utils.applicationPixelRatio()==1) size = (size + 0.5) >>0;
             me.context.imageSmoothingEnabled = false;
             me.context.mozImageSmoothingEnabled = false;
             me.context.msImageSmoothingEnabled = false;
@@ -614,13 +614,13 @@ define([
             me.context.lineWidth = size * me.scale;
             var points = me.getLine(size, border);
             me.context.beginPath();
+            me.context.fillStyle = me.getBorderColor(border);
             me.context.strokeStyle = me.getBorderColor(border);
             me.context.moveTo(points.X1, points.Y1);
             me.context.lineTo(points.X2, points.Y2);
             me.context.stroke();
 
         },
-
 
 
 
@@ -648,6 +648,7 @@ define([
             me.drawBorder('b');
             me.drawBorder('l');
             me.drawBorder('r');
+
             me.context.lineWidth = 0;
 
             me.context.beginPath();
