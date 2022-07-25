@@ -348,6 +348,7 @@ define([
 
             me.setBordersSize = function(borders, size){
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
+                size = (size + 0.5)>>0;
                 if (borders.indexOf('t') > -1) {
                     borderSize.top = size;
                     borderColor.top.toRGBA((borderSize.top < 1)   ? 0.2 : 1);
@@ -364,9 +365,6 @@ define([
                     borderSize.left = size;
                     borderColor.left.toRGBA((borderSize.left < 1)   ? 0.2 : 1);
                 }
-
-
-
             };
 
             me.setBordersColor = function(borders, color){
@@ -426,15 +424,16 @@ define([
                 var sizeCornerScale = (me.sizeCorner + 0) * me.scale ;
 
                 var linePoints={},
-                    indent = sizeCornerScale + me.scale*borderWidth/2,
+                    indent = sizeCornerScale + me.scale * borderWidth / 2,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
 
+
                 switch (border){
                     case 't':
-                        linePoints.X1 = sizeCornerScale;
+                        linePoints.X1 = sizeCornerScale>>0;
                         linePoints.Y1 = indent;
-                        linePoints.X2 = canvWidth - sizeCornerScale;
+                        linePoints.X2 = (canvWidth - sizeCornerScale)>>0;
                         linePoints.Y2 = linePoints.Y1;
                         break;
                     case 'b':
@@ -606,7 +605,6 @@ define([
             var me = this;
             var size = me.getBorderSize(border);
             if(size == 0) return;
-            if(Common.Utils.applicationPixelRatio()==1) size = (size + 0.5) >>0;
             me.context.imageSmoothingEnabled = false;
             me.context.mozImageSmoothingEnabled = false;
             me.context.msImageSmoothingEnabled = false;
@@ -614,15 +612,12 @@ define([
             me.context.lineWidth = size * me.scale;
             var points = me.getLine(size, border);
             me.context.beginPath();
-            me.context.fillStyle = me.getBorderColor(border);
             me.context.strokeStyle = me.getBorderColor(border);
             me.context.moveTo(points.X1, points.Y1);
             me.context.lineTo(points.X2, points.Y2);
             me.context.stroke();
 
         },
-
-
 
         drawTable: function (){
             this.drawCorners();
@@ -634,7 +629,6 @@ define([
             var tableWidth = me.width * me.scale - 2*sizeCornerScale,
                 tdWidth = tableWidth/me.columns,
                 tableHeight = me.height * me.scale - 2*sizeCornerScale, tdHeight = tableHeight/me.rows;
-
 
             if(me.backgroundColor != 'transparent' ){
                 me.context.beginPath();

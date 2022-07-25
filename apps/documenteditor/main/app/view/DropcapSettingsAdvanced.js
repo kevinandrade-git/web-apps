@@ -151,8 +151,8 @@ define([
                     {id: Common.UI.getId(), displayValue: '1.5 ' + txtPt,            value: 1.5,  pxValue: 2,     offsety: 40},
                     {id: Common.UI.getId(), displayValue: '2.25 ' + txtPt,           value: 2.25, pxValue: 3,     offsety: 60},
                     {id: Common.UI.getId(), displayValue: '3 ' + txtPt,              value: 3,    pxValue: 4,     offsety: 80},
-                    {id: Common.UI.getId(), displayValue: '4.5 ' + txtPt,            value: 4.5,  pxValue: 5,     offsety: 100},
-                    {id: Common.UI.getId(), displayValue: '6 ' + txtPt,              value: 6,    pxValue: 6,     offsety: 120}
+                    {id: Common.UI.getId(), displayValue: '4.5 ' + txtPt,            value: 4.5,  pxValue: 6,     offsety: 100},
+                    {id: Common.UI.getId(), displayValue: '6 ' + txtPt,              value: 6,    pxValue: 8,     offsety: 120}
                 ]
             }).on('selected', _.bind(function(combo, record) {
                 this.BorderSize = {ptValue: record.value, pxValue: record.pxValue};
