@@ -100,7 +100,7 @@ define([
         me.setBordersSize = function (size) {
             size = (size > this.maxBorderSize) ? this.maxBorderSize : size;
             borderAlfa = (size<1) ? 0.3 : 1;
-            borderSize = (size+0.5)>>0;
+            borderSize = ((size==0.5)&&(me.ratio!=1))?size:(size+0.5)>>0;
 
         };
 
@@ -348,7 +348,7 @@ define([
 
             me.setBordersSize = function(borders, size){
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
-                size = (size + 0.5)>>0;
+                size = ((size==0.5)&&(me.ratio!=1))?size:(size + 0.5)>>0;
                 if (borders.indexOf('t') > -1) {
                     borderSize.top = size;
                     borderColor.top.toRGBA((borderSize.top < 1)   ? 0.2 : 1);
@@ -427,8 +427,6 @@ define([
                     indent = sizeCornerScale + me.scale * borderWidth / 2,
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
-
-
                 switch (border){
                     case 't':
                         linePoints.X1 = sizeCornerScale>>0;
