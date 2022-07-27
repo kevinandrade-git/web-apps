@@ -150,9 +150,9 @@ define([
                 };
             else
                 return {
-                    X1: (((me.X1 - borderSize/2)>>0) + me.scale*borderSize/2) * me.scale,
+                    X1: (((me.X1 - borderSize/2)>>0) + borderSize/2) * me.scale,
                     Y1: me.Y1 * me.scale,
-                    X2: (((me.X2 - borderSize/2)>>0) + me.scale*borderSize/2) * me.scale,
+                    X2: (((me.X2 - borderSize/2)>>0) + borderSize/2) * me.scale,
                     Y2: me.Y2 * me.scale
                 };
         };
@@ -522,7 +522,7 @@ define([
                 for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
                     opt.y1 = sizeCorner;
-                    opt.y2 = me.canv.height - sizeCorner;
+                    opt.y2 = me.canv.height/me.scale - sizeCorner;
                     opt.x1 = (col + 1) * stepX + sizeCorner;
                     opt.x2 = opt.x1;
                     opt.col = col;

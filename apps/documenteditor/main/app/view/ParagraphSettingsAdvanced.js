@@ -1329,8 +1329,8 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
             if (value <=1.5) return 2;
             if (value <=2.25) return 3;
             if (value <=3) return 4;
-            if (value <=4.5) return 5;
-            return 6;
+            if (value <=4.5) return 6;
+            return 8;
         },
 
         addTab: function(btn, eOpts){
