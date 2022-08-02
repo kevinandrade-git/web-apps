@@ -404,7 +404,6 @@ define([
 
             me.getLine =function  (borderWidth, border ){
                 var sizeCornerScale = me.sizeCorner * me.scale ;
-
                 var linePoints={},
                     canvWidth = me.width * me.scale,
                     canvHeight =me.height * me.scale;
@@ -485,16 +484,15 @@ define([
                 var ctxWidth = me.width*me.scale,
                     ctxHeight = me.height*me.scale,
                     stepX = (ctxWidth - 2 * sizeCorner)/me.columns,
-                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows;
+                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows);
 
                 var generalOpt = {
                     scale   : me.scale,
                     context : me.context
                 };
                 for (var row = 0; row < me.rows - 1; row++) {
-                    var r = (row + 1) * stepY + sizeCorner
                     opt = generalOpt;
-                    opt.y1 = ctxHeight-r;
+                    opt.y1 = (row + 1) * stepY + sizeCorner;
                     opt.y2 = opt.y1;
                     opt.x1 = sizeCorner;
                     opt.x2 = ctxWidth - sizeCorner;
