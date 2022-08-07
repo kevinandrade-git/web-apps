@@ -484,7 +484,7 @@ define([
                 var ctxWidth = me.width*me.scale,
                     ctxHeight = me.height*me.scale,
                     stepX = (ctxWidth - 2 * sizeCorner)/me.columns,
-                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows);
+                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows;
 
                 var generalOpt = {
                     scale   : me.scale,
