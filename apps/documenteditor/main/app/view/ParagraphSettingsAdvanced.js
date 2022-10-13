@@ -390,7 +390,7 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
             this.BordersImage = new Common.UI.TableStyler({
                 el: $('#id-deparagraphstyler'),
                 width: 200,
-                height: 170,
+                height: 172,
                 rows: this.tableStylerRows,
                 columns: this.tableStylerColumns,
                 spacingMode: false
