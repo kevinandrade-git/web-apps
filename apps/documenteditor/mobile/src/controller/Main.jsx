@@ -3,7 +3,7 @@ import React, {Component, Fragment} from 'react';
 import {inject} from "mobx-react";
 import { f7 } from "framework7-react";
 import { withTranslation } from 'react-i18next';
-import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage';
+import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage.mjs';
 import CollaborationController from '../../../../common/mobile/lib/controller/collaboration/Collaboration.jsx';
 import {InitReviewController as ReviewController} from '../../../../common/mobile/lib/controller/collaboration/Review.jsx';
 import { onAdvancedOptions } from './settings/Download.jsx';
@@ -31,7 +31,8 @@ import { Device } from '../../../../common/mobile/utils/device';
     "storeChartSettings",
     "storeApplicationSettings",
     "storeLinkSettings",
-    "storeToolbarSettings"
+    "storeToolbarSettings",
+    "storeNavigation"
     )
 class MainController extends Component {
     constructor(props) {
@@ -60,9 +61,7 @@ class MainController extends Component {
             !window.sdk_scripts && (window.sdk_scripts = ['../../../../sdkjs/common/AllFonts.js',
                                                             '../../../../sdkjs/word/sdk-all-min.js']);
             let dep_scripts = ['../../../vendor/xregexp/xregexp-all-min.js',
-                                '../../../vendor/sockjs/sockjs.min.js',
-                                '../../../vendor/jszip/jszip.min.js',
-                                '../../../vendor/jszip-utils/jszip-utils.min.js'];
+                                '../../../vendor/sockjs/sockjs.min.js'];
             dep_scripts.push(...window.sdk_scripts);
 
             const promise_get_script = (scriptpath) => {
@@ -115,7 +114,6 @@ class MainController extends Component {
                 if (data.doc) {
                     this.permissions = Object.assign(this.permissions, data.doc.permissions);
 
-                    const _permissions = Object.assign({}, data.doc.permissions);
                     const _options = Object.assign({}, data.doc.options, this.editorConfig.actionLink || {});
                     const _userOptions = this.props.storeAppOptions.user;
                     const _user = new Asc.asc_CUserInfo();
@@ -126,6 +124,7 @@ class MainController extends Component {
                     docInfo = new Asc.asc_CDocInfo();
                     docInfo.put_Id(data.doc.key);
                     docInfo.put_Url(data.doc.url);
+                    docInfo.put_DirectUrl(data.doc.directUrl);
                     docInfo.put_Title(data.doc.title);
                     docInfo.put_Format(data.doc.fileType);
                     docInfo.put_VKey(data.doc.vkey);
@@ -133,7 +132,7 @@ class MainController extends Component {
                     docInfo.put_UserInfo(_user);
                     docInfo.put_CallbackUrl(this.editorConfig.callbackUrl);
                     docInfo.put_Token(data.doc.token);
-                    docInfo.put_Permissions(_permissions);
+                    docInfo.put_Permissions(data.doc.permissions);
                     docInfo.put_EncryptedInfo(this.editorConfig.encryptionKeys);
                     docInfo.put_Lang(this.editorConfig.lang);
                     docInfo.put_Mode(this.editorConfig.mode);
@@ -215,6 +214,16 @@ class MainController extends Component {
 
                 this.applyMode(storeAppOptions);
 
+                const storeDocumentInfo = this.props.storeDocumentInfo;
+                const dataDoc = storeDocumentInfo.dataDoc;
+                const isExtRestriction = dataDoc.fileType !== 'oform';
+
+                if(isExtRestriction) {
+                    this.api.asc_addRestriction(Asc.c_oAscRestrictionType.View);
+                } else {
+                    this.api.asc_addRestriction(Asc.c_oAscRestrictionType.OnlyForms)
+                }
+
                 this.api.asc_LoadDocument();
                 this.api.Resize();
             };
@@ -257,6 +266,14 @@ class MainController extends Component {
                 appSettings.changeShowTableEmptyLine(value);
                 this.api.put_ShowTableEmptyLine(value);
 
+                value = LocalStorage.getBool('mobile-view', true);
+
+                if(value) {
+                    this.api.ChangeReaderMode();
+                } else {
+                    appOptions.changeMobileView();
+                }
+
                 if (appOptions.isEdit && this.needToUpdateVersion) {
                     Common.Notifications.trigger('api:disconnect');
                 }
@@ -273,7 +290,6 @@ class MainController extends Component {
                 this.api.Resize();
                 this.api.zoomFitToWidth();
                 this.api.asc_GetDefaultTableStyles && setTimeout(() => {this.api.asc_GetDefaultTableStyles()}, 1);
-
                 this.applyLicense();
 
                 Common.Notifications.trigger('document:ready');
@@ -305,6 +321,16 @@ class MainController extends Component {
                                 _translate[item] += ' ';
                         }
                     }
+                    ["Error! Bookmark not defined",
+                     "No table of contents entries found",
+                     "No table of figures entries found",
+                     "Error! Main Document Only",
+                     "Error! Not a valid bookmark self-reference",
+                     "Error! No text of specified style in document"].forEach(item => {
+                        _translate[item + '.'] = _translate[item];
+                        delete _translate[item];
+                    });
+
                     this.api = new Asc.asc_docs_api({
                         'id-view'  : 'editor_sdk',
                         'mobile'   : true,
@@ -437,7 +463,8 @@ class MainController extends Component {
                 || licType === Asc.c_oLicenseResult.SuccessLimit && (appOptions.trialMode & Asc.c_oLicenseMode.Limited) !== 0))
             this._state.licenseType = licType;
 
-        if (licType !== undefined && appOptions.canLiveView && (licType===Asc.c_oLicenseResult.ConnectionsLive || licType===Asc.c_oLicenseResult.ConnectionsLiveOS))
+        if (licType !== undefined && appOptions.canLiveView && (licType===Asc.c_oLicenseResult.ConnectionsLive || licType===Asc.c_oLicenseResult.ConnectionsLiveOS ||
+                                                                licType===Asc.c_oLicenseResult.UsersViewCount || licType===Asc.c_oLicenseResult.UsersViewCountOS))
             this._state.licenseType = licType;
 
         if (this._isDocReady && this._state.licenseType)
@@ -472,7 +499,8 @@ class MainController extends Component {
         }
 
         if (appOptions.config.mode === 'view') {
-            if (appOptions.canLiveView && (this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLive || this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLiveOS)) {
+            if (appOptions.canLiveView && (this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLive || this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLiveOS ||
+                                            this._state.licenseType===Asc.c_oLicenseResult.UsersViewCount || this._state.licenseType===Asc.c_oLicenseResult.UsersViewCountOS)) {
                 appOptions.canLiveView = false;
                 this.api.asc_SetFastCollaborative(false);
             }
@@ -713,6 +741,12 @@ class MainController extends Component {
           storeDocumentInfo.changeCount(this.objectInfo);
         });
 
+        this.api.asc_registerCallback('asc_onMeta', (meta) => {
+            if(meta) {
+                storeDocumentInfo.changeTitle(meta.title);
+            }
+        });
+
         // Color Schemes
 
         this.api.asc_registerCallback('asc_onSendThemeColorSchemes', (arr) => {
@@ -743,6 +777,12 @@ class MainController extends Component {
         });
 
         this.api.asc_registerCallback('asc_onReplaceAll', this.onApiTextReplaced.bind(this));
+
+        const storeNavigation = this.props.storeNavigation;
+
+        this.api.asc_registerCallback('asc_onViewerBookmarksUpdate', (bookmarks) => {
+            storeNavigation.initBookmarks(bookmarks);
+        });
     }
 
     onApiTextReplaced(found, replaced) {

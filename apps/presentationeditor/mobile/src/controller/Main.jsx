@@ -11,7 +11,7 @@ import {
 } from "../../../../common/mobile/lib/controller/collaboration/Comments";
 import ErrorController from "./Error";
 import LongActionsController from "./LongActions";
-import {LocalStorage} from "../../../../common/mobile/utils/LocalStorage";
+import {LocalStorage} from "../../../../common/mobile/utils/LocalStorage.mjs";
 import About from '../../../../common/mobile/lib/view/About';
 import PluginsController from '../../../../common/mobile/lib/controller/Plugins.jsx';
 import { Device } from '../../../../common/mobile/utils/device';
@@ -107,7 +107,6 @@ class MainController extends Component {
                 if (data.doc) {
                     this.permissions = Object.assign(this.permissions, data.doc.permissions);
 
-                    const _permissions = Object.assign({}, data.doc.permissions);
                     const _options = Object.assign({}, data.doc.options, this.editorConfig.actionLink || {});
                     const _user = new Asc.asc_CUserInfo();
                     const _userOptions = this.props.storeAppOptions.user;
@@ -118,6 +117,7 @@ class MainController extends Component {
                     docInfo = new Asc.asc_CDocInfo();
                     docInfo.put_Id(data.doc.key);
                     docInfo.put_Url(data.doc.url);
+                    docInfo.put_DirectUrl(data.doc.directUrl);
                     docInfo.put_Title(data.doc.title);
                     docInfo.put_Format(data.doc.fileType);
                     docInfo.put_VKey(data.doc.vkey);
@@ -125,7 +125,7 @@ class MainController extends Component {
                     docInfo.put_UserInfo(_user);
                     docInfo.put_CallbackUrl(this.editorConfig.callbackUrl);
                     docInfo.put_Token(data.doc.token);
-                    docInfo.put_Permissions(_permissions);
+                    docInfo.put_Permissions(data.doc.permissions);
                     docInfo.put_EncryptedInfo(this.editorConfig.encryptionKeys);
                     docInfo.put_Lang(this.editorConfig.lang);
                     docInfo.put_Mode(this.editorConfig.mode);
@@ -163,8 +163,26 @@ class MainController extends Component {
 
             const onEditorPermissions = params => {
                 const licType = params.asc_getLicenseType();
+                const { t } = this.props;
+                // const _t = t('Controller.Main', { returnObjects:true });
+               
+                if (Asc.c_oLicenseResult.Expired === licType ||
+                    Asc.c_oLicenseResult.Error === licType ||
+                    Asc.c_oLicenseResult.ExpiredTrial === licType) {
 
-                this.appOptions.canLicense      = (licType === Asc.c_oLicenseResult.Success || licType === Asc.c_oLicenseResult.SuccessLimit);
+                    f7.dialog.create({
+                        title: t('Controller.Main.titleLicenseExp'),
+                        text: t('Controller.Main.warnLicenseExp')
+                    }).open();
+
+                    return;
+                }
+
+                if (Asc.c_oLicenseResult.ExpiredLimited === licType) {
+                    this._state.licenseType = licType;
+                }
+
+                this.appOptions.canLicense = (licType === Asc.c_oLicenseResult.Success || licType === Asc.c_oLicenseResult.SuccessLimit);
 
                 const storeAppOptions = this.props.storeAppOptions;
                 storeAppOptions.setPermissionOptions(this.document, licType, params, this.permissions, EditorUIController.isSupportEditFeature());
@@ -435,6 +453,16 @@ class MainController extends Component {
         });
 
         this.api.asc_registerCallback('asc_onReplaceAll', this.onApiTextReplaced.bind(this));
+
+        // Presentation Info
+
+        const storePresentationInfo = this.props.storePresentationInfo;
+
+        this.api.asc_registerCallback('asc_onMeta', (meta) => {
+            if(meta) {
+                storePresentationInfo.changeTitle(meta.title);
+            }
+        });
     }
 
     onApiTextReplaced(found, replaced) {
@@ -508,7 +536,8 @@ class MainController extends Component {
                 || licType === Asc.c_oLicenseResult.SuccessLimit && (appOptions.trialMode & Asc.c_oLicenseMode.Limited) !== 0))
             this._state.licenseType = licType;
 
-        if (licType !== undefined && appOptions.canLiveView && (licType===Asc.c_oLicenseResult.ConnectionsLive || licType===Asc.c_oLicenseResult.ConnectionsLiveOS))
+        if (licType !== undefined && appOptions.canLiveView && (licType===Asc.c_oLicenseResult.ConnectionsLive || licType===Asc.c_oLicenseResult.ConnectionsLiveOS||
+                                                                licType===Asc.c_oLicenseResult.UsersViewCount || licType===Asc.c_oLicenseResult.UsersViewCountOS))
             this._state.licenseType = licType;
 
         if (this._isDocReady && this._state.licenseType)
@@ -543,7 +572,8 @@ class MainController extends Component {
         }
 
         if (appOptions.config.mode === 'view') {
-            if (appOptions.canLiveView && (this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLive || this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLiveOS)) {
+            if (appOptions.canLiveView && (this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLive || this._state.licenseType===Asc.c_oLicenseResult.ConnectionsLiveOS ||
+                                            this._state.licenseType===Asc.c_oLicenseResult.UsersViewCount || this._state.licenseType===Asc.c_oLicenseResult.UsersViewCountOS)) {
                 appOptions.canLiveView = false;
                 this.api.asc_SetFastCollaborative(false);
             }

@@ -6,7 +6,8 @@
     "textEmail": "E-poçt",
     "textPoweredBy": "ilə enerji ilə təmin olunur",
     "textTel": "Telefon",
-    "textVersion": "Versiya"
+    "textVersion": "Versiya",
+    "textEditor": "Spreadsheet Editor"
   },
   "Common": {
     "Collaboration": {
@@ -31,7 +32,8 @@
       "textReopen": "Təkrar açın",
       "textResolve": "Həll edin",
       "textTryUndoRedo": "Qaytar/Təkrarla funksiyaları Sürətli birgə redaktə rejimi üçün qeyri-aktiv edilib.",
-      "textUsers": "İstifadəçilər"
+      "textUsers": "İstifadəçilər",
+      "textSharingSettings": "Sharing Settings"
     },
     "ThemeColorPalette": {
       "textCustomColors": "Fərdi Rənglər",
@@ -62,12 +64,16 @@
     "notcriticalErrorTitle": "Xəbərdarlıq",
     "textCopyCutPasteActions": "Kopyalama, Kəsmə və Yapışdırma Əməliyyatları",
     "textDoNotShowAgain": "Bir daha göstərmə",
-    "warnMergeLostData": "Birləşdirilmiş xanada yalnız yuxarı sol xanadakı məlumatlar qalacaq. <br>Davam etmək istədiyinizdən əminsiniz?"
+    "warnMergeLostData": "Birləşdirilmiş xanada yalnız yuxarı sol xanadakı məlumatlar qalacaq. <br>Davam etmək istədiyinizdən əminsiniz?",
+    "menuEditLink": "Edit Link",
+    "textOk": "Ok",
+    "txtWarnUrl": "Clicking this link can be harmful to your device and data.<br>Are you sure you want to continue?"
   },
   "Controller": {
     "Main": {
       "criticalErrorTitle": "Xəta",
       "errorAccessDeny": "Hüquqlarınız olmayan əməliyyatı yerinə yetirməyə çalışırsınız.<br>Lütfən, admininizlə əlaqə saxlayın.",
+      "errorOpensource": "Ödənişsiz İcma versiyasından istifadə edərək sənədləri yalnız baxmaq üçün aça bilərsiniz. Mobil veb redaktorlarına daxil olmaq üçün kommersiya lisenziyası tələb olunur.",
       "errorProcessSaveResult": "Saxlama prosesi uğursuz oldu.",
       "errorServerVersion": "Redaktor versiyası yeniləndi. Dəyişiklikləri tətbiq etmək üçün səhifə yenidən yüklənəcək.",
       "errorUpdateVersion": "Fayl versiyası dəyişdirilib. Səhifə yenidən yüklənəcək.",
@@ -155,13 +161,14 @@
       "warnNoLicense": "Siz 1% redaktorlarına eyni vaxtda qoşulma limitinə çatdınız. Bu sənəd yalnız baxmaq üçün açılacaq. Şəxsi təkmilləşdirmə şərtləri üçün 1% satış komandası ilə əlaqə saxlayın.",
       "warnNoLicenseUsers": "1% redaktor üçün istifadəçi limitinə çatdınız. Şəxsi təkmilləşdirmə şərtləri üçün 1% satış komandası ilə əlaqə saxlayın.",
       "warnProcessRightsChange": "Faylı redaktə etmək icazəniz yoxdur.",
-      "errorOpensource": "Using the free Community version, you can open documents for viewing only. To access mobile web editors, a commercial license is required.",
       "textNoChoices": "There are no choices for filling the cell.<br>Only text values from the column can be selected for replacement.",
       "textNoTextFound": "Text not found",
       "textOk": "Ok",
       "textReplaceSkipped": "The replacement has been made. {0} occurrences were skipped.",
       "textReplaceSuccess": "The search has been done. Occurrences replaced: {0}",
-      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?"
+      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?",
+      "titleLicenseExp": "License expired",
+      "warnLicenseExp": "Your license has expired. Please, update your license and refresh the page."
     }
   },
   "Error": {
@@ -235,7 +242,8 @@
     "uploadImageExtMessage": "Naməlum təsvir formatı.",
     "uploadImageFileCountMessage": "Heç bir təsvir yüklənməyib.",
     "uploadImageSizeMessage": "Təsvir çox böyükdür. Maksimum ölçü 25 MB-dır.",
-    "errorCannotUseCommandProtectedSheet": "You cannot use this command on a protected sheet. To use this command, unprotect the sheet.<br>You might be requested to enter a password."
+    "errorCannotUseCommandProtectedSheet": "You cannot use this command on a protected sheet. To use this command, unprotect the sheet.<br>You might be requested to enter a password.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "advDRMPassword": "Parol",
@@ -276,7 +284,10 @@
     "txtEditingMode": "Redaktə rejimini təyin edin...",
     "uploadImageTextText": "Təsvir yüklənir...",
     "uploadImageTitleText": "Təsvir Yüklənir",
-    "waitText": "Lütfən, gözləyin..."
+    "waitText": "Lütfən, gözləyin...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Statusbar": {
     "notcriticalErrorTitle": "Xəbərdarlıq",
@@ -364,8 +375,10 @@
       "txtYes": "Bəli",
       "textAllTableHint": "Returns the entire contents of the table or specified table columns including column headers, data and total rows",
       "textDataTableHint": "Returns the data cells of the table or specified table columns",
+      "textDone": "Done",
       "textHeadersTableHint": "Returns the column headers for the table or specified table columns",
       "textOk": "Ok",
+      "textRecommended": "Recommended",
       "textThisRowHint": "Choose only this row of the specified column",
       "textTotalsTableHint": "Returns the total rows for the table or specified table columns"
     },
@@ -399,7 +412,6 @@
       "textBottomBorder": "Aşağı Sərhəd",
       "textBringToForeground": "Ön plana Çıxarın",
       "textCell": "Xana",
-      "textCellStyles": "Xana Üslubları",
       "textCenter": "Mərkəz",
       "textChart": "Diaqram",
       "textChartTitle": "Diaqram Başlığı",
@@ -499,10 +511,7 @@
       "textPt": "pt",
       "textRange": "Diapazon",
       "textRemoveChart": "Diaqramı Silin",
-      "textRemoveImage": "Təsviri Silin",
-      "textRemoveLink": "Keçidi Silin",
       "textRemoveShape": "Formanı Silin",
-      "textReorder": "Yenidən sıralayın",
       "textReplace": "Əvəz edin",
       "textReplaceImage": "Təsviri Əvəz edin",
       "textRequired": "Tələb olunur",
@@ -548,8 +557,16 @@
       "txtNotUrl": "Bu sahədə \"http://www.example.com\" formatında URL olmalıdır",
       "txtSortHigh2Low": "Ən Böyükdən ən Kiçiyə doğru Çeşidləyin.",
       "txtSortLow2High": "Ən Kiçikdən ən Böyüyə doğru Çeşidləyin.",
+      "textArrange": "Arrange",
       "textAutomatic": "Automatic",
-      "textOk": "Ok"
+      "textCancel": "Cancel",
+      "textCellStyle": "Cell Style",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
+      "textDone": "Done",
+      "textOk": "Ok",
+      "textRecommended": "Recommended"
     },
     "Settings": {
       "advCSVOptions": "CSV seçimlərini seçin",
@@ -681,7 +698,11 @@
       "txtTab": "Tab",
       "warnDownloadAs": "Bu formatda yadda saxlamağa davam etsəniz, mətndən başqa bütün funksiyalar itiriləcək.<br>Davam etmək istədiyinizdən əminsiniz?",
       "textDarkTheme": "Dark Theme",
-      "textFeedback": "Feedback & Support"
+      "textDirection": "Direction",
+      "textFeedback": "Feedback & Support",
+      "textLeftToRight": "Left To Right",
+      "textRestartApplication": "Please restart the application for the changes to take effect",
+      "textRightToLeft": "Right To Left"
     }
   }
 }

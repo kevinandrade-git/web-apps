@@ -6,7 +6,8 @@
     "textEmail": "E-poçt",
     "textPoweredBy": "ilə enerji ilə təmin olunur",
     "textTel": "Telefon",
-    "textVersion": "Versiya"
+    "textVersion": "Versiya",
+    "textEditor": "Presentation Editor"
   },
   "Common": {
     "Collaboration": {
@@ -31,7 +32,8 @@
       "textReopen": "Təkrar açın",
       "textResolve": "Həll edin",
       "textTryUndoRedo": "Qaytar/Təkrarla funksiyaları Sürətli birgə redaktə rejimi üçün qeyri-aktiv edilib.",
-      "textUsers": "İstifadəçilər"
+      "textUsers": "İstifadəçilər",
+      "textSharingSettings": "Sharing Settings"
     },
     "ThemeColorPalette": {
       "textCustomColors": "Fərdi Rənglər",
@@ -58,7 +60,10 @@
     "textColumns": "Sütunlar",
     "textCopyCutPasteActions": "Kopyalama, Kəsmə və Yapışdırma Əməliyyatları",
     "textDoNotShowAgain": "Bir daha göstərmə",
-    "textRows": "Sətirlər"
+    "textRows": "Sətirlər",
+    "menuEditLink": "Edit Link",
+    "textOk": "Ok",
+    "txtWarnUrl": "Clicking this link can be harmful to your device and data.<br>Are you sure you want to continue?"
   },
   "Controller": {
     "Main": {
@@ -166,7 +171,8 @@
     "unknownErrorText": "Naməlum xəta.",
     "uploadImageExtMessage": "Naməlum təsvir formatı.",
     "uploadImageFileCountMessage": "Heç bir təsvir yüklənməyib.",
-    "uploadImageSizeMessage": "Təsvir çox böyükdür. Maksimum ölçü 25 MB-dır."
+    "uploadImageSizeMessage": "Təsvir çox böyükdür. Maksimum ölçü 25 MB-dır.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "applyChangesTextText": "Məlumat yüklənir...",
@@ -197,7 +203,10 @@
     "txtEditingMode": "Redaktə rejimini təyin edin...",
     "uploadImageTextText": "Təsvir yüklənir...",
     "uploadImageTitleText": "Təsvir Yüklənir",
-    "waitText": "Lütfən, gözləyin..."
+    "waitText": "Lütfən, gözləyin...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Toolbar": {
     "dlgLeaveMsgText": "Bu sənəddə saxlanmamış dəyişiklikləriniz var. Avtomatik saxlanmanı gözləmək üçün \"Bu Səhifədə Qalın\" hissəsinin üzərinə klikləyin. Bütün saxlanmamış dəyişiklikləri ləğv etmək üçün \"Bu səhifədən Çıxın\" hissəsinin üzərinə klikləyin.",
@@ -242,7 +251,10 @@
       "textTable": "Cədvəl",
       "textTableSize": "Cədvəl Ölçüsü",
       "txtNotUrl": "Bu sahədə \"http://www.example.com\" formatında URL olmalıdır",
-      "textOk": "Ok"
+      "textDone": "Done",
+      "textOk": "Ok",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Edit": {
       "notcriticalErrorTitle": "Xəbərdarlıq",
@@ -345,11 +357,8 @@
       "textPt": "pt",
       "textPush": "Bas",
       "textRemoveChart": "Diaqramı Silin",
-      "textRemoveImage": "Təsviri Silin",
-      "textRemoveLink": "Keçidi Silin",
       "textRemoveShape": "Formanı Silin",
       "textRemoveTable": "Cədvəli Silin",
-      "textReorder": "Yenidən sırala",
       "textReplace": "Əvəz edin",
       "textReplaceAll": "Hamısını Əvəz edin",
       "textReplaceImage": "Təsviri Əvəz edin",
@@ -391,9 +400,17 @@
       "textZoomIn": "Böyüdün",
       "textZoomOut": "Kiçilt",
       "textZoomRotate": "Miqyası dəyiş və Fırlat",
+      "textArrange": "Arrange",
       "textAutomatic": "Automatic",
+      "textCancel": "Cancel",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
       "textDesign": "Design",
-      "textOk": "Ok"
+      "textInsertImage": "Insert Image",
+      "textOk": "Ok",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Settings": {
       "mniSlideStandard": "Standart (4:3)",
@@ -473,8 +490,12 @@
       "txtScheme7": "Bərabər",
       "txtScheme8": "Axın",
       "txtScheme9": "Emalatxana",
+      "notcriticalErrorTitle": "Warning",
       "textDarkTheme": "Dark Theme",
-      "textFeedback": "Feedback & Support"
+      "textFeedback": "Feedback & Support",
+      "textOk": "Ok",
+      "textRestartApplication": "Please restart the application for the changes to take effect",
+      "textRTL": "RTL"
     }
   }
 }

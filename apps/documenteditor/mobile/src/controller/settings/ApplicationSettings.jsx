@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { ApplicationSettings } from "../../view/settings/ApplicationSettings";
-import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage';
+import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage.mjs';
 import {observer, inject} from "mobx-react";
 import { Themes } from '../../../../../common/mobile/lib/controller/Themes.js';
 
@@ -63,6 +63,10 @@ class ApplicationSettingsController extends Component {
         LocalStorage.setItem("de-mobile-macros-mode", value);
     }
 
+    changeDirection(value) {
+       LocalStorage.setItem('mode-direction', value);
+    }
+
     render() {
         return (
             <ApplicationSettings 
@@ -72,7 +76,8 @@ class ApplicationSettingsController extends Component {
                 switchShowTableEmptyLine={this.switchShowTableEmptyLine}
                 switchDisplayComments={this.switchDisplayComments}
                 switchDisplayResolved={this.switchDisplayResolved}  
-                setMacrosSettings={this.setMacrosSettings}               
+                setMacrosSettings={this.setMacrosSettings}  
+                changeDirection={this.changeDirection}             
             />
         )
     }

@@ -3,6 +3,7 @@
     "textAbout": "À propos",
     "textAddress": "Adresse",
     "textBack": "Retour",
+    "textEditor": "Éditeur de Présentation",
     "textEmail": "E-mail",
     "textPoweredBy": "Réalisation",
     "textTel": "Tél.",
@@ -31,7 +32,8 @@
       "textReopen": "Rouvrir",
       "textResolve": "Résoudre",
       "textTryUndoRedo": "Les fonctions Annuler/Rétablir sont désactivées pour le mode de co-édition rapide.",
-      "textUsers": "Utilisateurs"
+      "textUsers": "Utilisateurs",
+      "textSharingSettings": "Sharing Settings"
     },
     "HighlightColorPalette": {
       "textNoFill": "Pas de remplissage"
@@ -58,7 +60,10 @@
     "textColumns": "Colonnes",
     "textCopyCutPasteActions": "Fonctions de Copier, Couper et Coller",
     "textDoNotShowAgain": "Ne plus afficher",
-    "textRows": "Lignes"
+    "textOk": "OK",
+    "textRows": "Lignes",
+    "txtWarnUrl": "Cliquer sur ce lien peut être dangereux pour votre appareil et vos données. <br>Êtes-vous sûr de vouloir continuer ?",
+    "menuEditLink": "Edit Link"
   },
   "Controller": {
     "Main": {
@@ -113,6 +118,7 @@
       "textRemember": "Se souvenir de mon choix",
       "textReplaceSkipped": "Le remplacement a été effectué. {0} occurrences ont été sautées.",
       "textReplaceSuccess": "La recherche a été effectuée. Occurrences remplacées : {0}",
+      "textRequestMacros": "Une macro fait une demande à l'URL. Voulez-vous autoriser la demande à l'adresse %1 ?",
       "textYes": "Oui",
       "titleLicenseExp": "Licence expirée",
       "titleServerVersion": "L'éditeur est mis à jour",
@@ -126,8 +132,7 @@
       "warnLicenseUsersExceeded": "Vous avez dépassé le nombre maximal d’utilisateurs des éditeurs %1. Pour en savoir plus, contactez votre administrateur.",
       "warnNoLicense": "Vous avez dépassé le nombre maximal de connexions simultanées aux éditeurs %1. Ce document sera ouvert en lecture seule. Contactez l’équipe des ventes %1 pour mettre à jour les termes de la licence.",
       "warnNoLicenseUsers": "Vous avez dépassé le nombre maximal d’utilisateurs des éditeurs %1. Contactez l’équipe des ventes %1 pour mettre à jour les termes de la licence.",
-      "warnProcessRightsChange": "Vous n'avez pas la permission de modifier ce fichier.",
-      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?"
+      "warnProcessRightsChange": "Vous n'avez pas la permission de modifier ce fichier."
     }
   },
   "Error": {
@@ -166,7 +171,8 @@
     "unknownErrorText": "Erreur inconnue.",
     "uploadImageExtMessage": "Format d'image inconnu.",
     "uploadImageFileCountMessage": "Aucune image chargée.",
-    "uploadImageSizeMessage": "L'image est trop grande. La taille limite est de 25 Mo."
+    "uploadImageSizeMessage": "L'image est trop grande. La taille limite est de 25 Mo.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "applyChangesTextText": "Chargement des données en cours...",
@@ -197,7 +203,10 @@
     "txtEditingMode": "Réglage mode d'édition...",
     "uploadImageTextText": "Chargement d'une image en cours...",
     "uploadImageTitleText": "Chargement d'une image",
-    "waitText": "Veuillez patienter..."
+    "waitText": "Veuillez patienter...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Toolbar": {
     "dlgLeaveMsgText": "Vous avez des modifications non enregistrées dans ce document. Cliquez sur Rester sur cette page et attendez l'enregistrement automatique. Cliquez sur Quitter cette page pour annuler toutes les modifications non enregistrées.",
@@ -242,11 +251,14 @@
       "textSlideNumber": "Numéro de diapositive",
       "textTable": "Tableau",
       "textTableSize": "Taille du tableau",
-      "txtNotUrl": "Ce champ doit contenir une URL au format \"http://www.example.com\""
+      "txtNotUrl": "Ce champ doit contenir une URL au format \"http://www.example.com\"",
+      "textDone": "Done",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Edit": {
       "notcriticalErrorTitle": "Avertissement",
-      "textActualSize": "Taille réelle",
+      "textActualSize": "Taille actuelle",
       "textAddCustomColor": "Ajouter une couleur personnalisée",
       "textAdditional": "Additionnel",
       "textAdditionalFormatting": "Mise en forme supplémentaire",
@@ -348,11 +360,8 @@
       "textPt": "pt",
       "textPush": "Expulsion",
       "textRemoveChart": "Supprimer le graphique",
-      "textRemoveImage": "Supprimer l'image",
-      "textRemoveLink": "Supprimer le lien",
       "textRemoveShape": "Supprimer la forme",
       "textRemoveTable": "Supprimer le tableau",
-      "textReorder": "Réorganiser",
       "textReplace": "Remplacer",
       "textReplaceAll": "Remplacer tout",
       "textReplaceImage": "Remplacer l’image",
@@ -393,11 +402,20 @@
       "textZoom": "Zoom",
       "textZoomIn": "Zoom avant",
       "textZoomOut": "Zoom arrière",
-      "textZoomRotate": "Zoom et rotation"
+      "textZoomRotate": "Zoom et rotation",
+      "textArrange": "Arrange",
+      "textCancel": "Cancel",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
+      "textInsertImage": "Insert Image",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Settings": {
       "mniSlideStandard": "Standard (4:3)",
       "mniSlideWide": "Écran large (16:9)",
+      "notcriticalErrorTitle": "Attention",
       "textAbout": "À propos",
       "textAddress": "Adresse :",
       "textApplication": "Application",
@@ -420,6 +438,7 @@
       "textEmail": "émail: ",
       "textEnableAll": "Activer tout",
       "textEnableAllMacrosWithoutNotification": "Activer toutes les macros sans notification",
+      "textFeedback": "Commentaires & assistance",
       "textFind": "Recherche",
       "textFindAndReplace": "Rechercher et remplacer",
       "textFindAndReplaceAll": "Rechercher et remplacer tout",
@@ -432,6 +451,7 @@
       "textLocation": "Emplacement",
       "textMacrosSettings": "Réglages macros",
       "textNoTextFound": "Le texte est introuvable",
+      "textOk": "OK",
       "textOwner": "Propriétaire",
       "textPoint": "Point",
       "textPoweredBy": "Réalisation",
@@ -441,6 +461,8 @@
       "textPrint": "Imprimer",
       "textReplace": "Remplacer",
       "textReplaceAll": "Remplacer tout",
+      "textRestartApplication": "Veuillez redémarrer l'application pour que les modifications soient prises en compte",
+      "textRTL": "De droite à gauche",
       "textSearch": "Rechercher",
       "textSettings": "Paramètres",
       "textShowNotification": "Montrer la notification",
@@ -473,8 +495,7 @@
       "txtScheme6": "Rotonde",
       "txtScheme7": "Capitaux",
       "txtScheme8": "Flux",
-      "txtScheme9": "Fonderie",
-      "textFeedback": "Feedback & Support"
+      "txtScheme9": "Fonderie"
     }
   }
 }

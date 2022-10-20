@@ -20,7 +20,14 @@ label {
     }
 
     &.disabled {
+        opacity: @component-disabled-opacity-ie;
         opacity: @component-disabled-opacity;
+    }
+
+    &.fixed {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
 
@@ -89,6 +96,10 @@ label {
     }
 
     #left-panel-comments {
+        height: 100%;
+    }
+
+    #left-panel-search {
         height: 100%;
     }
 }
@@ -161,6 +172,9 @@ label {
         display: block;
     }
 
+    .padding-very-small {
+        padding-bottom: 4px;
+    }
     .padding-small {
         padding-bottom: 8px;
     }
@@ -203,6 +217,7 @@ label {
         height: 100%;
 
         &.disabled {
+            opacity: @component-disabled-opacity-ie;
             opacity: @component-disabled-opacity;
             cursor: default !important;
         }
@@ -221,6 +236,10 @@ textarea {
     background-color: @background-normal;
     color: @text-normal-ie;
     color: @text-normal;
+    &:-ms-input-placeholder {
+        color: @text-tertiary-ie;
+    }
+    .placeholder();
 }
 
 .btn-edit-table,

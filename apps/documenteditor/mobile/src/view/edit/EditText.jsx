@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {Device} from '../../../../../common/mobile/utils/device';
 import { ThemeColorPalette, CustomColorPicker } from '../../../../../common/mobile/lib/component/ThemeColorPalette.jsx';
 import HighlightColorPalette from '../../../../../common/mobile/lib/component/HighlightColorPalette.jsx';
-import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage';
+import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage.mjs';
 
 const PageFonts = props => {
     const isAndroid = Device.android;
@@ -32,10 +32,8 @@ const PageFonts = props => {
 
     const getImageUri = fonts => {
         return fonts.map(font => {
-            thumbContext.clearRect(0, 0, thumbs[thumbIdx].width, thumbs[thumbIdx].height);
-            thumbContext.drawImage(spriteThumbs, 0, -thumbs[thumbIdx].height * Math.floor(font.imgidx / spriteCols));
-
-            return thumbCanvas.toDataURL();
+            let index = Math.floor(font.imgidx/spriteCols);
+            return spriteThumbs.getImage(index, thumbCanvas, thumbContext).toDataURL();
         });
     };
 
@@ -48,11 +46,15 @@ const PageFonts = props => {
 
     const renderExternal = (vl, vlData) => {
         setVlFonts((prevState) => {
-            let fonts = [...prevState.vlData.items];
-            fonts.splice(vlData.fromIndex, vlData.toIndex, ...vlData.items);
+            let fonts = [...prevState.vlData.items],
+                drawFonts = [...vlData.items];
 
-            let images = getImageUri(fonts);
-
+            let images = [],
+                drawImages = getImageUri(drawFonts);
+            for (let i = 0; i < drawFonts.length; i++) {
+                fonts[i + vlData.fromIndex] = drawFonts[i];
+                images[i + vlData.fromIndex] = drawImages[i];
+            }
             return {vlData: {
                     items: fonts,
                     images,
@@ -105,16 +107,19 @@ const PageFonts = props => {
                 renderExternal: renderExternal
             }}>
                 <ul>
-                    {vlFonts.vlData.items.map((item, index) => (
-                        <ListItem className="font-item" key={index} radio checked={curFontName === item.name} onClick={() => {
-                            storeTextSettings.changeFontFamily(item.name); 
-                            props.changeFontFamily(item.name);
-                            storeTextSettings.addFontToRecent(item); 
+                    {vlFonts.vlData.items.map((item, index) => {
+                        const font = item || fonts[index];
+                        const fontName = font.name;
+                        return (<ListItem className="font-item" key={index} radio checked={curFontName === fontName} onClick={() => {
+                            storeTextSettings.changeFontFamily(fontName);
+                            props.changeFontFamily(fontName);
+                            storeTextSettings.addFontToRecent(font);
                             addRecentStorage();
                         }}>
-                            <img src={vlFonts.vlData.images[index]} style={{width: `${iconWidth}px`, height: `${iconHeight}px`}} />
+                            {vlFonts.vlData.images[index] && <img src={vlFonts.vlData.images[index]} style={{width: `${iconWidth}px`, height: `${iconHeight}px`}} />}
                         </ListItem>
-                    ))}
+                        )
+                    })}
                 </ul>
             </List>
         </Page>
@@ -208,9 +213,7 @@ const PageBullets = observer( props => {
                             storeTextSettings.resetBullets(bullet.subtype);
                             props.onBullet(bullet.subtype);
                         }}>
-                        <div id={`id-markers-${bullet.subtype}`} className='item-marker'>
-                        
-                        </div>
+                        <div id={`id-markers-${bullet.subtype}`} className='item-marker'></div>
                     </ListItem>
                 ))}
             </List>
@@ -236,24 +239,22 @@ const PageNumbers = observer( props => {
         props.getIconsBulletsAndNumbers($$('.item-number'), 1);
     }, []);
     
-    return(
+    return (
         <View className='numbers dataview'>
             <List className="row" style={{listStyle: 'none'}}>
-                {numberArrays.map(number => (
-                    <ListItem key={'number-' + number.subtype} data-type={number.subtype} className={(number.subtype === typeNumbers) && 
-                        (storeTextSettings.listType === 1 || storeTextSettings.listType === -1) ? 'active' : ''}
-                        onClick={() => {
-                            storeTextSettings.resetNumbers(number.subtype);
-                            props.onNumber(number.subtype);
-                        }}>
-                        <div id={`id-numbers-${number.subtype}`} className='item-number'>
-
-                        </div>
-                    </ListItem>
-                ))}
+            {numberArrays.map( number => (
+                        <ListItem key={'number-' + number.subtype} data-type={number.subtype} className={(number.subtype === typeNumbers) && 
+                            (storeTextSettings.listType === 1 || storeTextSettings.listType === -1) ? 'active' : ''}
+                            onClick={() => {
+                                storeTextSettings.resetNumbers(number.subtype);
+                                props.onNumber(number.subtype);
+                            }}>
+                            <div id={`id-numbers-${number.subtype}`} className='item-number'></div>
+                        </ListItem>
+                    ))}
             </List>
         </View>
-    )
+    );
 });
 
 const PageMultiLevel = observer( props => {
@@ -499,6 +500,11 @@ const EditText = props => {
     const isAndroid = Device.android;
     const { t } = useTranslation();
     const storeTextSettings = props.storeTextSettings;
+    const storeFocusObjects = props.storeFocusObjects;
+    const shapeObject = storeFocusObjects.shapeObject;
+    const shapePr = shapeObject && shapeObject.get_ShapeProperties();
+    const inSmartArt = shapePr && shapePr.asc_getFromSmartArt();
+    const inSmartArtInternal = shapePr && shapePr.asc_getFromSmartArtInternal();
     const fontName = storeTextSettings.fontName || t('Edit.textFonts');
     const fontSize = storeTextSettings.fontSize;
     const fontColor = storeTextSettings.textColor;
@@ -588,25 +594,33 @@ const EditText = props => {
                         </a>
                     </Row>
                 </ListItem>
-                <ListItem className='buttons'>
-                    <Row>
-                        <a className='button item-link' onClick={() => {props.onParagraphMove(true)}}>
-                            <Icon slot="media" icon="icon-de-indent"></Icon>
-                        </a>
-                        <a className='button item-link' onClick={() => {props.onParagraphMove(false)}}>
-                            <Icon slot="media" icon="icon-in-indent"></Icon>
-                        </a>
-                    </Row>
-                </ListItem>
-                <ListItem title={t('Edit.textBulletsAndNumbers')} link='/edit-bullets-and-numbers/' routeProps={{
-                    onBullet: props.onBullet,
-                    onNumber: props.onNumber,
-                    onMultiLevelList: props.onMultiLevelList,
-                    getIconsBulletsAndNumbers: props.getIconsBulletsAndNumbers,
-                }}>
-                    <div className="preview">{previewList}</div>
-                    {!isAndroid && <Icon slot="media" icon="icon-bullets"></Icon>}
-                </ListItem>
+                {!inSmartArtInternal &&
+                    <ListItem className='buttons'>
+                        <Row>
+                            <a className='button item-link' onClick={() => {
+                                props.onParagraphMove(true)
+                            }}>
+                                <Icon slot="media" icon="icon-de-indent"></Icon>
+                            </a>
+                            <a className='button item-link' onClick={() => {
+                                props.onParagraphMove(false)
+                            }}>
+                                <Icon slot="media" icon="icon-in-indent"></Icon>
+                            </a>
+                        </Row>
+                    </ListItem>
+                }
+                {!inSmartArt && !inSmartArtInternal &&
+                    <ListItem title={t('Edit.textBulletsAndNumbers')} link='/edit-bullets-and-numbers/' routeProps={{
+                        onBullet: props.onBullet,
+                        onNumber: props.onNumber,
+                        onMultiLevelList: props.onMultiLevelList,
+                        getIconsBulletsAndNumbers: props.getIconsBulletsAndNumbers,
+                    }}>
+                        <div className="preview">{previewList}</div>
+                        {!isAndroid && <Icon slot="media" icon="icon-bullets"></Icon>}
+                    </ListItem>
+                }
                 <ListItem title={t("Edit.textLineSpacing")} link='/edit-text-line-spacing/' routeProps={{
                     onLineSpacing: props.onLineSpacing
                 }}>

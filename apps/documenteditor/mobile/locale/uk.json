@@ -6,7 +6,8 @@
     "textEmail": "Email",
     "textPoweredBy": "Розроблено",
     "textTel": "Телефон",
-    "textVersion": "Версія"
+    "textVersion": "Версія",
+    "textEditor": "Document Editor"
   },
   "Add": {
     "notcriticalErrorTitle": "Увага",
@@ -58,9 +59,12 @@
     "textTable": "Таблиця",
     "textTableSize": "Розмір таблиці",
     "txtNotUrl": "Це поле має бути URL-адресою у форматі \"http://www.example.com\"",
+    "textDone": "Done",
+    "textRecommended": "Recommended",
+    "textRequired": "Required",
     "textTableContents": "Table of Contents",
-    "textWithPageNumbers": "With Page Numbers",
-    "textWithBlueLinks": "With Blue Links"
+    "textWithBlueLinks": "With Blue Links",
+    "textWithPageNumbers": "With Page Numbers"
   },
   "Common": {
     "Collaboration": {
@@ -159,7 +163,8 @@
       "textTryUndoRedo": "Функції скасування і повтору дій відключені для режиму швидкого спільного редагування.",
       "textUnderline": "Підкреслений",
       "textUsers": "Користувачі",
-      "textWidow": "Заборона висячих рядків"
+      "textWidow": "Заборона висячих рядків",
+      "textSharingSettings": "Sharing Settings"
     },
     "HighlightColorPalette": {
       "textNoFill": "Без заливки"
@@ -197,8 +202,10 @@
     "textNumberingValue": "Початкове значення",
     "textOk": "Ок",
     "textRows": "Рядки",
+    "menuEditLink": "Edit Link",
     "textRefreshEntireTable": "Refresh entire table",
-    "textRefreshPageNumbersOnly": "Refresh page numbers only"
+    "textRefreshPageNumbersOnly": "Refresh page numbers only",
+    "txtWarnUrl": "Clicking this link can be harmful to your device and data.<br>Are you sure you want to continue?"
   },
   "Edit": {
     "notcriticalErrorTitle": "Увага",
@@ -292,13 +299,10 @@
     "textPageBreakBefore": "З нової сторінки",
     "textPageNumbering": "Нумерація сторінок",
     "textParagraph": "Абзац",
-    "textParagraphStyles": "Стилі абзацу",
     "textPictureFromLibrary": "Зображення з бібліотеки",
     "textPictureFromURL": "Зображення з URL",
     "textPt": "Пт",
     "textRemoveChart": "Видалити діаграму",
-    "textRemoveImage": "Видалити зображення",
-    "textRemoveLink": "Видалити посилання",
     "textRemoveShape": "Видалити форму",
     "textRemoveTable": "Видалити таблицю",
     "textReorder": "Порядок",
@@ -336,28 +340,43 @@
     "textType": "Тип",
     "textWe": "Ср",
     "textWrap": "Стиль обтікання",
-    "textTableOfCont": "TOC",
-    "textPageNumbers": "Page Numbers",
-    "textSimple": "Simple",
-    "textRightAlign": "Right Align",
-    "textLeader": "Leader",
-    "textStructure": "Structure",
-    "textRefresh": "Refresh",
-    "textLevels": "Levels",
-    "textRemoveTableContent": "Remove table of content",
-    "textCurrent": "Current",
-    "textOnline": "Online",
-    "textClassic": "Classic",
-    "textDistinctive": "Distinctive",
-    "textCentered": "Centered",
-    "textFormal": "Formal",
-    "textStandard": "Standard",
-    "textModern": "Modern",
+    "textAmountOfLevels": "Amount of Levels",
     "textCancel": "Cancel",
+    "textCentered": "Centered",
+    "textChangeShape": "Change Shape",
+    "textClassic": "Classic",
+    "textCreateTextStyle": "Create new text style",
+    "textCurrent": "Current",
+    "textCustomStyle": "Custom Style",
+    "textDeleteImage": "Delete Image",
+    "textDeleteLink": "Delete Link",
+    "textDistinctive": "Distinctive",
+    "textDone": "Done",
+    "textEnterTitleNewStyle": "Enter title of a new style",
+    "textFormal": "Formal",
+    "textLeader": "Leader",
+    "textLevels": "Levels",
+    "textModern": "Modern",
+    "textNextParagraphStyle": "Next paragraph style",
+    "textOnline": "Online",
+    "textPageNumbers": "Page Numbers",
+    "textParagraphStyle": "Paragraph Style",
+    "textRecommended": "Recommended",
+    "textRefresh": "Refresh",
     "textRefreshEntireTable": "Refresh entire table",
     "textRefreshPageNumbersOnly": "Refresh page numbers only",
+    "textRemoveTableContent": "Remove table of contents",
+    "textRequired": "Required",
+    "textRightAlign": "Right Align",
+    "textSameCreatedNewStyle": "Same as created new style",
+    "textSimple": "Simple",
+    "textStandard": "Standard",
+    "textStructure": "Structure",
     "textStyles": "Styles",
-    "textAmountOfLevels": "Amount of Levels"
+    "textTableOfCont": "TOC",
+    "textTextWrapping": "Text Wrapping",
+    "textTitle": "Title",
+    "textWrappingStyle": "Wrapping Style"
   },
   "Error": {
     "convertationTimeoutText": "Перевищено час очікування конверсії.",
@@ -398,8 +417,10 @@
     "uploadImageExtMessage": "Невідомий формат зображення.",
     "uploadImageFileCountMessage": "Жодного зображення не завантажено.",
     "uploadImageSizeMessage": "Занадто велике зображення. Максимальний розмір – 25 MB.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading.",
     "errorEmptyTOC": "Start creating a table of contents by applying a heading style from the Styles gallery to the selected text.",
-    "errorNoTOC": "There's no table of contents to update. You can insert one from the References tab."
+    "errorNoTOC": "There's no table of contents to update. You can insert one from the References tab.",
+    "errorTextFormWrongFormat": "The value entered does not match the format of the field."
   },
   "LongActions": {
     "applyChangesTextText": "Завантаження даних...",
@@ -434,7 +455,10 @@
     "txtEditingMode": "Встановити режим редагування ...",
     "uploadImageTextText": "Завантаження зображення...",
     "uploadImageTitleText": "Завантаження зображення",
-    "waitText": "Будь ласка, зачекайте..."
+    "waitText": "Будь ласка, зачекайте...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Main": {
     "criticalErrorTitle": "Помилка",
@@ -646,23 +670,31 @@
     "txtScheme7": "Власний",
     "txtScheme8": "Потік",
     "txtScheme9": "Ливарна",
+    "textBeginningDocument": "Beginning of document",
+    "textDirection": "Direction",
+    "textEmptyHeading": "Empty Heading",
+    "textEmptyScreens": "There are no headings in the document. Apply a headings style to the text so that it appears in the table of contents.",
     "textFastWV": "Fast Web View",
     "textFeedback": "Feedback & Support",
+    "textLeftToRight": "Left To Right",
+    "textMobileView": "Mobile View",
+    "textNavigation": "Navigation",
     "textNo": "No",
     "textPageSize": "Page Size",
+    "textPdfProducer": "PDF Producer",
     "textPdfTagged": "Tagged PDF",
     "textPdfVer": "PDF Version",
-    "textYes": "Yes",
-    "textNavigation": "Navigation",
-    "textEmptyScreens": "There are no headings in the document. Apply a headings style to the text so that it appeas in the table of cotents.",
-    "textBeginningDocument": "Beginning of document",
-    "textEmptyHeading": "Empty Heading",
-    "textPdfProducer": "PDF Producer"
+    "textRestartApplication": "Please restart the application for the changes to take effect",
+    "textRightToLeft": "Right To Left",
+    "textYes": "Yes"
   },
   "Toolbar": {
     "dlgLeaveMsgText": "У документі є незбережені зміни. Натисніть 'Залишитись на сторінці', щоб дочекатися автозбереження. Натисніть 'Піти зі сторінки', щоб скинути всі незбережені зміни.",
     "dlgLeaveTitleText": "Ви виходите з програми",
     "leaveButtonText": "Залишити цю сторінку",
-    "stayButtonText": "Залишитися на сторінці"
+    "stayButtonText": "Залишитися на сторінці",
+    "textOk": "OK",
+    "textSwitchedMobileView": "Switched to Mobile view",
+    "textSwitchedStandardView": "Switched to Standard view"
   }
 }

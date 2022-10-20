@@ -54,8 +54,6 @@ require.config({
         jmousewheel     : '../vendor/perfect-scrollbar/src/jquery.mousewheel',
         xregexp         : '../vendor/xregexp/xregexp-all-min',
         sockjs          : '../vendor/sockjs/sockjs.min',
-        jszip           : '../vendor/jszip/jszip.min',
-        jsziputils      : '../vendor/jszip-utils/jszip-utils.min',
         allfonts        : '../../sdkjs/common/AllFonts',
         sdk             : '../../sdkjs/slide/sdk-all-min',
         api             : 'api/documents/api',
@@ -108,9 +106,7 @@ require.config({
                 'underscore',
                 'allfonts',
                 'xregexp',
-                'sockjs',
-                'jszip',
-                'jsziputils'
+                'sockjs'
             ]
         },
         gateway: {
@@ -136,6 +132,8 @@ require([
     'gateway',
     'locale'
 ], function (Backbone, Bootstrap, Core) {
+    if (Backbone.History && Backbone.History.started)
+        return;
     Backbone.history.start();
 
     /**
@@ -153,6 +151,7 @@ require([
             'LeftMenu',
             'Main',
             'ViewTab',
+            'Search',
             'Common.Controllers.Fonts',
             'Common.Controllers.History'
             /** coauthoring begin **/
@@ -182,6 +181,7 @@ require([
             'presentationeditor/main/app/controller/LeftMenu',
             'presentationeditor/main/app/controller/Main',
             'presentationeditor/main/app/controller/ViewTab',
+            'presentationeditor/main/app/controller/Search',
             'presentationeditor/main/app/view/FileMenuPanels',
             'presentationeditor/main/app/view/ParagraphSettings',
             'presentationeditor/main/app/view/ImageSettings',

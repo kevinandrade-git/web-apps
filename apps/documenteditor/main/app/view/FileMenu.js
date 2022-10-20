@@ -66,6 +66,14 @@ define([
                     var item = _.findWhere(this.items, {el: event.currentTarget});
                     if (item) {
                         var panel = this.panels[item.options.action];
+                        if (item.options.action === 'help') {
+                            if ( panel.noHelpContents === true && navigator.onLine ) {
+                                this.fireEvent('item:click', [this, 'external-help', true]);
+                                window.open(panel.urlHelpCenter, '_blank');
+                                return;
+                            }
+                        }
+
                         this.fireEvent('item:click', [this, item.options.action, !!panel]);
 
                         if (panel) {
@@ -79,6 +87,9 @@ define([
         },
 
         initialize: function () {
+            this._state = {
+                infoPreviewMode: false
+            };
         },
 
         render: function () {
@@ -355,6 +366,7 @@ define([
                     'info'      : (new DE.Views.FileMenuPanels.DocumentInfo({menu:this})).render(this.$el.find('#panel-info')),
                     'rights'    : (new DE.Views.FileMenuPanels.DocumentRights({menu:this})).render(this.$el.find('#panel-rights'))
                 };
+                this._state.infoPreviewMode && this.panels['info'].setPreviewMode(this._state.infoPreviewMode);
             }
 
             if (!this.mode) return;
@@ -368,7 +380,7 @@ define([
             isVisible && (lastSeparator = this.miClose.$el.find('+.devider'));
 
             this.miDownload[((this.mode.canDownload || this.mode.canDownloadOrigin) && (!this.mode.isDesktopApp || !this.mode.isOffline))?'show':'hide']();
-            var isBCSupport = window["AscDesktopEditor"] ? window["AscDesktopEditor"]["isBlockchainSupport"]() : false;
+            var isBCSupport = Common.Controllers.Desktop.isActive() ? Common.Controllers.Desktop.call("isBlockchainSupport") : false;
             this.miSaveCopyAs[((this.mode.canDownload || this.mode.canDownloadOrigin) && (!this.mode.isDesktopApp || !this.mode.isOffline)) && (this.mode.canRequestSaveAs || this.mode.saveAsUrl) && !isBCSupport ?'show':'hide']();
             this.miSaveAs[((this.mode.canDownload || this.mode.canDownloadOrigin) && this.mode.isDesktopApp && this.mode.isOffline)?'show':'hide']();
             this.miSave[this.mode.isEdit && Common.UI.LayoutManager.isElementVisible('toolbar-file-save') ?'show':'hide']();
@@ -428,7 +440,6 @@ define([
 
             if ( this.mode.canCreateNew ) {
                 if (this.mode.templates && this.mode.templates.length) {
-                    $('a',this.miNew.$el).text(this.btnCreateNewCaption + '...');
                     !this.panels['new'] && (this.panels['new'] = ((new DE.Views.FileMenuPanels.CreateNew({menu: this, docs: this.mode.templates, blank: this.mode.canRequestCreateNew || !!this.mode.createUrl})).render()));
                 }
             }
@@ -561,6 +572,7 @@ define([
 
             options && options.protect && _btn_protect.setDisabled(disable);
             options && options.history && _btn_history.setDisabled(disable);
+            options && options.info && (this.panels ? this.panels['info'].setPreviewMode(disable) : this._state.infoPreviewMode = disable );
         },
 
         isVisible: function () {

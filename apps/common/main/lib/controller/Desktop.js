@@ -60,10 +60,12 @@ define([
             'btn-save-coauth': 'coauth',
             'btn-synch': 'synch' };
 
-        var is_win_xp = window.RendererProcessVariable && window.RendererProcessVariable.os === 'winxp';
+        var nativevars;
 
         if ( !!native ) {
             native.features = native.features || {};
+            nativevars = window.RendererProcessVariable;
+
             window.on_native_message = function (cmd, param) {
                 if (/^style:change/.test(cmd)) {
                     var obj = JSON.parse(param);
@@ -88,11 +90,8 @@ define([
                             $('.asc-window.modal').css('top', obj.skiptoparea);
 
                         Common.Utils.InternalSettings.set('window-inactive-area-top', obj.skiptoparea);
-                    } else
-                    if ( obj.lockthemes != undefined ) {
-                        // TODO: remove after 7.0.2. depricated. used is_win_xp variable instead
-                        // Common.UI.Themes.setAvailable(!obj.lockthemes);
                     }
+
                     if ( obj.singlewindow !== undefined ) {
                         $('#box-document-title .hedset')[obj.singlewindow ? 'hide' : 'show']();
                         native.features.singlewindow = obj.singlewindow;
@@ -139,7 +138,7 @@ define([
                     }
                 } else
                 if (/althints:show/.test(cmd)) {
-                    if ( param == /false|hide/.test(param) )
+                    if ( /false|hide/.test(param) )
                         Common.NotificationCenter.trigger('hints:clear');
                 }
             };
@@ -192,7 +191,26 @@ define([
         };
 
         var _onHintsShow = function (visible, level) {
-            native.execCommand('althints:show', JSON.stringify(visible && !(level > 0)));
+            let info = {
+                visible: visible && !(level > 0),
+            };
+
+            if ( !!titlebuttons ) {
+                info.hints = {};
+                !!titlebuttons['print'] && (info.hints['print'] = titlebuttons['print'].btn.btnEl.attr('data-hint-title'));
+                !!titlebuttons['undo'] && (info.hints['undo'] = titlebuttons['undo'].btn.btnEl.attr('data-hint-title'));
+                !!titlebuttons['redo'] && (info.hints['redo'] = titlebuttons['redo'].btn.btnEl.attr('data-hint-title'));
+                !!titlebuttons['save'] && (info.hints['save'] = titlebuttons['save'].btn.btnEl.attr('data-hint-title'));
+            }
+
+            native.execCommand('althints:show', JSON.stringify(info));
+        }
+
+        var _onKeyDown = function (e) {
+            if ( Common.UI.HintManager.isHintVisible() ) {
+                native.execCommand('althints:keydown', JSON.stringify({code:e.keyCode}));
+                console.log('hint keydown', e.keyCode);
+            }
         }
 
         return {
@@ -200,6 +218,8 @@ define([
                 _.extend(config, opts);
 
                 if ( config.isDesktopApp ) {
+                    let is_win_xp = nativevars && nativevars.os === 'winxp';
+
                     Common.UI.Themes.setAvailable(!is_win_xp);
                     Common.NotificationCenter.on('app:ready', function (opts) {
                         _.extend(config, opts);
@@ -266,9 +286,13 @@ define([
                         'modal:show': _onModalDialog.bind(this, 'open'),
                         'modal:close': _onModalDialog.bind(this, 'close'),
                         'uitheme:changed' : function (name) {
-                            var theme = Common.UI.Themes.get(name);
-                            if ( theme )
-                                native.execCommand("uitheme:changed", JSON.stringify({name:name, type:theme.type}));
+                            if (Common.localStorage.getBool('ui-theme-use-system', false)) {
+                                native.execCommand("uitheme:changed", JSON.stringify({name:'theme-system'}));
+                            } else {
+                                var theme = Common.UI.Themes.get(name);
+                                if ( theme )
+                                    native.execCommand("uitheme:changed", JSON.stringify({name:name, type:theme.type}));
+                            }
                         },
                         'hints:show': _onHintsShow.bind(this),
                     });
@@ -287,6 +311,8 @@ define([
                             },
                         },
                     }, {id: 'desktop'});
+
+                    $(document).on('keydown', _onKeyDown.bind(this));
                 }
             },
             process: function (opts) {
@@ -328,9 +354,19 @@ define([
             call: function (name) {
                 if ( native[name] ) {
                     let args = [].slice.call(arguments, 1);
-                    return native[name](...args);
+                    // return native[name](...args);
+                    return native[name].apply(this, args);
                 }
             },
+            helpUrl: function () {
+                if ( !!nativevars && nativevars.helpUrl ) {
+                    var webapp = window.SSE ? 'spreadsheeteditor' :
+                                    window.PE ? 'presentationeditor' : 'documenteditor';
+                    return nativevars.helpUrl + '/' + webapp + '/main/resources/help';
+                }
+
+                return undefined;
+            }
         };
     };
 

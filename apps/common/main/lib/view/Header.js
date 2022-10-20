@@ -105,6 +105,7 @@ define([
                                     '<div class="btn-slot" id="slot-btn-mode"></div>' +
                                     '<div class="btn-slot" id="slot-btn-back"></div>' +
                                     '<div class="btn-slot" id="slot-btn-favorite"></div>' +
+                                    '<div class="btn-slot" id="slot-btn-search"></div>' +
                                 '</div>' +
                                 '<div class="hedset">' +
                                     // '<div class="btn-slot slot-btn-user-name"></div>' +
@@ -208,11 +209,24 @@ define([
         function updateDocNamePosition(config) {
             if ( $labelDocName && config) {
                 var $parent = $labelDocName.parent();
-                if (!config.isEdit || !config.customization || !config.customization.compactHeader) {
+                if (!config.isEdit) {
                     var _left_width = $parent.position().left,
                         _right_width = $parent.next().outerWidth();
                     $parent.css('padding-left', _left_width < _right_width ? Math.max(2, _right_width - _left_width) : 2);
                     $parent.css('padding-right', _left_width < _right_width ? 2 : Math.max(2, _left_width - _right_width));
+                } else if (!(config.customization && config.customization.compactHeader)) {
+                    var _left_width = $parent.position().left,
+                        _right_width = $parent.next().outerWidth(),
+                        outerWidth = $labelDocName.outerWidth(),
+                        cssWidth = $labelDocName[0].style.width;
+                    cssWidth = cssWidth ? parseFloat(cssWidth) : outerWidth;
+                    if (cssWidth - outerWidth > 0.1) {
+                        $parent.css('padding-left', _left_width < _right_width ? Math.max(2, $parent.outerWidth() - 2 - cssWidth) : 2);
+                        $parent.css('padding-right', _left_width < _right_width ? 2 : Math.max(2, $parent.outerWidth() - 2 - cssWidth));
+                    } else {
+                        $parent.css('padding-left', _left_width < _right_width ? Math.max(2, Math.min(_right_width - _left_width + 2, $parent.outerWidth() - 2 - cssWidth)) : 2);
+                        $parent.css('padding-right', _left_width < _right_width ? 2 : Math.max(2, Math.min(_left_width - _right_width + 2, $parent.outerWidth() - 2 - cssWidth)));
+                    }
                 }
 
                 if (!(config.customization && config.customization.toolbarHideFileName) && (!config.isEdit || config.customization && config.customization.compactHeader)) {
@@ -222,6 +236,12 @@ define([
                     $parent.closest('.extra.right').css('flex-basis', Math.ceil(basis) + $parent.next().outerWidth() + 'px');
                     Common.NotificationCenter.trigger('tab:resize');
                 }
+            }
+        }
+
+        function onResize() {
+            if (appConfig && appConfig.isEdit && !(appConfig.customization && appConfig.customization.compactHeader)) {
+                updateDocNamePosition(appConfig);
             }
         }
 
@@ -348,6 +368,12 @@ define([
                     });
                 }
             }
+
+            if (me.btnSearch)
+                me.btnSearch.updateHint(me.tipSearch +  Common.Utils.String.platformKey('Ctrl+F'));
+
+            if (appConfig.isEdit && !(appConfig.customization && appConfig.customization.compactHeader))
+                Common.NotificationCenter.on('window:resize', onResize);
         }
 
         function onFocusDocName(e){
@@ -447,6 +473,15 @@ define([
                     reset   : onResetUsers
                 });
 
+                me.btnSearch = new Common.UI.Button({
+                    cls: 'btn-header no-caret',
+                    iconCls: 'toolbar__icon icon--inverse btn-menu-search',
+                    enableToggle: true,
+                    dataHint: '0',
+                    dataHintDirection: 'bottom',
+                    dataHintOffset: 'big'
+                });
+
                 me.btnFavorite = new Common.UI.Button({
                     id: 'btn-favorite',
                     cls: 'btn-header',
@@ -481,7 +516,7 @@ define([
                         disabled: disabled === true,
                         dataHint:'0',
                         dataHintDirection: hintDirection ? hintDirection : (config.isDesktopApp ? 'right' : 'left'),
-                        dataHintOffset: hintOffset ? hintOffset : (config.isDesktopApp ? '10, -10' : '10, 10'),
+                        dataHintOffset: hintOffset ? hintOffset : (config.isDesktopApp ? '10, -18' : '10, 10'),
                         dataHintTitle: hintTitle
                     })).render(slot);
                 }
@@ -508,7 +543,7 @@ define([
                     if ( !$labelDocName ) {
                         $labelDocName = $html.find('#rib-doc-name');
                         if ( me.documentCaption ) {
-                            me.setDocTitle(me.documentCaption);
+                            setTimeout(function() { me.setDocTitle(me.documentCaption); }, 50);
                         }
                     } else {
                         $html.find('#rib-doc-name').hide();
@@ -540,6 +575,7 @@ define([
                         if ( config.canEdit && config.canRequestEditRights )
                             this.btnEdit = createTitleButton('toolbar__icon icon--inverse btn-edit', $html.findById('#slot-hbtn-edit'), undefined, 'bottom', 'big');
                     }
+                    me.btnSearch.render($html.find('#slot-btn-search'));
 
                     if (!config.isEdit || config.customization && !!config.customization.compactHeader) {
                         if (config.user.guest && config.canRenameAnonymous) {
@@ -585,7 +621,7 @@ define([
 
                     !!$labelDocName && $labelDocName.hide().off();                  // hide document title if it was created in right box
                     $labelDocName = $html.find('#title-doc-name');
-                    me.setDocTitle( me.documentCaption );
+                    setTimeout(function() { me.setDocTitle(me.documentCaption); }, 50);
 
                     me.options.wopi && $labelDocName.attr('maxlength', me.options.wopi.FileNameMaxLength);
 
@@ -720,7 +756,7 @@ define([
                             'focus': onFocusDocName.bind(this),
                             'blur': function (e) {
                                 me.imgCrypted && me.imgCrypted.toggleClass('hidden', false);
-                                label[0].selectionStart = label[0].selectionEnd = 0;
+                                Common.Utils.isGecko && (label[0].selectionStart = label[0].selectionEnd = 0);
                                 if(!me.isSaveDocName) {
                                     me.withoutExt = false;
                                     me.setDocTitle(me.documentCaption);
@@ -755,16 +791,14 @@ define([
             },
 
             setDocTitle: function(name){
-                if(name)
-                    $labelDocName.val(name);
-                else
-                    name = $labelDocName.val();
-                var width = this.getTextWidth(name);
+                var width = this.getTextWidth(name || $labelDocName.val());
                 (width>=0) && $labelDocName.width(width);
+                name && (width>=0) && $labelDocName.val(name);
                 if (this._showImgCrypted && width>=0) {
                     this.imgCrypted.toggleClass('hidden', false);
                     this._showImgCrypted = false;
                 }
+                (width>=0) && onResize();
             },
 
             getTextWidth: function(text) {
@@ -875,6 +909,7 @@ define([
             textRemoveFavorite: 'Remove from Favorites',
             textAddFavorite: 'Mark as favorite',
             textHideNotes: 'Hide Notes',
+            tipSearch: 'Search',
             textShare: 'Share'
         }
     }(), Common.Views.Header || {}))

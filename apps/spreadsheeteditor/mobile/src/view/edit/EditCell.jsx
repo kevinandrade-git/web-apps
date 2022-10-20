@@ -4,7 +4,7 @@ import {f7, List, ListItem, Icon, Row, Button, Page, Navbar, Segmented, BlockTit
 import { useTranslation } from 'react-i18next';
 import {Device} from '../../../../../common/mobile/utils/device';
 import { ThemeColorPalette, CustomColorPicker } from '../../../../../common/mobile/lib/component/ThemeColorPalette.jsx';
-import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage';
+import { LocalStorage } from '../../../../../common/mobile/utils/LocalStorage.mjs';
 
 const EditCell = props => {
     const isAndroid = Device.android;
@@ -144,7 +144,6 @@ const PageCellStyle = props => {
             </Navbar>
             {cellStyles && cellStyles.length ? (
                 <div className="swiper-container swiper-init" data-pagination='{"el": ".swiper-pagination"}'>
-                    <div className="swiper-pagination"></div>
                     <div className="swiper-wrapper">
                         {arraySlides.map((_, indexSlide) => {
                             let stylesSlide = cellStyles.slice(indexSlide * countStylesSlide, (indexSlide * countStylesSlide) + countStylesSlide);
@@ -161,6 +160,7 @@ const PageCellStyle = props => {
                                 </div>
                         )})}
                     </div>
+                    <div className="swiper-pagination"></div>
                 </div>
             ) : null}
         </Page>
@@ -195,10 +195,8 @@ const PageFontsCell = props => {
 
     const getImageUri = fonts => {
         return fonts.map(font => {
-            thumbContext.clearRect(0, 0, thumbs[thumbIdx].width, thumbs[thumbIdx].height);
-            thumbContext.drawImage(spriteThumbs, 0, -thumbs[thumbIdx].height * Math.floor(font.imgidx / spriteCols));
-
-            return thumbCanvas.toDataURL();
+            let index = Math.floor(font.imgidx/spriteCols);
+            return spriteThumbs.getImage(index, thumbCanvas, thumbContext).toDataURL();
         });
     };
 
@@ -211,15 +209,19 @@ const PageFontsCell = props => {
 
     const renderExternal = (vl, vlData) => {
         setVlFonts((prevState) => {
-            let fonts = [...prevState.vlData.items];
-            fonts.splice(vlData.fromIndex, vlData.toIndex, ...vlData.items);
+            let fonts = [...prevState.vlData.items],
+                drawFonts = [...vlData.items];
 
-            let images = getImageUri(fonts);
-
+            let images = [],
+                drawImages = getImageUri(drawFonts);
+            for (let i = 0; i < drawFonts.length; i++) {
+                fonts[i + vlData.fromIndex] = drawFonts[i];
+                images[i + vlData.fromIndex] = drawImages[i];
+            }
             return {vlData: {
-                items: fonts,
-                images,
-            }};
+                    items: fonts,
+                    images,
+                }}
         });
     };
 
@@ -271,15 +273,19 @@ const PageFontsCell = props => {
                 renderExternal: renderExternal
             }}>
                 <ul>
-                    {vlFonts.vlData.items.map((item, index) => (
-                        <ListItem className="font-item" key={index} radio checked={curFontName === item.name} onClick={() => {
-                            props.onFontClick(item.name);
-                            storeTextSettings.addFontToRecent(item); 
-                            addRecentStorage();
-                        }}>
-                            <img src={vlFonts.vlData.images[index]} style={{width: `${iconWidth}px`, height: `${iconHeight}px`}} />
-                        </ListItem>
-                    ))}
+                    {vlFonts.vlData.items.map((item, index) => {
+                        const font = item || fonts[index];
+                        const fontName = font.name;
+                        return (
+                            <ListItem className="font-item" key={index} radio checked={curFontName === fontName} onClick={() => {
+                                props.onFontClick(fontName);
+                                storeTextSettings.addFontToRecent(font);
+                                addRecentStorage();
+                            }}>
+                                {vlFonts.vlData.images[index] && <img src={vlFonts.vlData.images[index]} style={{width: `${iconWidth}px`, height: `${iconHeight}px`}} />}
+                            </ListItem>
+                        )
+                    })}
                 </ul>
             </List>
         </Page>

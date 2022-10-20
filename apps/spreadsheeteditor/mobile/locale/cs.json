@@ -3,6 +3,7 @@
     "textAbout": "O aplikaci",
     "textAddress": "Adresa",
     "textBack": "Zpět",
+    "textEditor": "Tabulkový editor",
     "textEmail": "Email",
     "textPoweredBy": "Poháněno",
     "textTel": "Telefon",
@@ -31,7 +32,8 @@
       "textReopen": "Znovu otevřít",
       "textResolve": "Vyřešit",
       "textTryUndoRedo": "Funkce Zpět/Znovu jsou vypnuty pro rychlý režim spolupráce.",
-      "textUsers": "Uživatelé"
+      "textUsers": "Uživatelé",
+      "textSharingSettings": "Sharing Settings"
     },
     "ThemeColorPalette": {
       "textCustomColors": "Vlastní barvy",
@@ -62,7 +64,10 @@
     "notcriticalErrorTitle": "Varování",
     "textCopyCutPasteActions": "Akce kopírovat, vyjmout a vložit",
     "textDoNotShowAgain": "Nezobrazovat znovu",
-    "warnMergeLostData": "Ve sloučené buňce budou zachována pouze data z původní levé horní buňky.<br>Opravdu chcete pokračovat?"
+    "textOk": "OK",
+    "txtWarnUrl": "Kliknutí na tento odkaz může být škodlivé pro Vaše zařízení a Vaše data.<br>Jste si jistí, že chcete pokračovat?",
+    "warnMergeLostData": "Ve sloučené buňce budou zachována pouze data z původní levé horní buňky.<br>Opravdu chcete pokračovat?",
+    "menuEditLink": "Edit Link"
   },
   "Controller": {
     "Main": {
@@ -151,6 +156,7 @@
       "textRemember": "Zapamatovat moji volbu",
       "textReplaceSkipped": "Nahrazení bylo provedeno. {0} výskytů bylo přeskočeno.",
       "textReplaceSuccess": "Hledání bylo dokončeno. Nahrazeno výskytů: {0}",
+      "textRequestMacros": "Makro vytváří požadavek na URL. Chcete povolit požadavek k přístupu na %1?",
       "textYes": "Ano",
       "titleServerVersion": "Editor byl aktualizován",
       "titleUpdateVersion": "Verze změněna",
@@ -161,7 +167,8 @@
       "warnNoLicense": "Došlo k dosažení limitu souběžného připojení %1 editorů. Tento dokument bude otevřen pouze pro náhled. Pro rozšíření funkcí kontaktujte %1 obchodní oddělení.",
       "warnNoLicenseUsers": "Došlo k dosažení limitu %1 editorů. Pro rozšíření funkcí kontaktujte %1 obchodní oddělení.",
       "warnProcessRightsChange": "Nemáte oprávnění pro úpravu tohoto dokumentu.",
-      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?"
+      "titleLicenseExp": "License expired",
+      "warnLicenseExp": "Your license has expired. Please, update your license and refresh the page."
     }
   },
   "Error": {
@@ -198,7 +205,7 @@
     "errorFormulaName": "Chyba ve vzorci.<br>Neplatný název vzorce.",
     "errorFormulaParsing": "Interní chyba při analýze vzorce.",
     "errorFrmlMaxLength": "Nelze přidat vzorec, délka vzorce je delší než povolený maximální počet znaků.<br>Prosím upravte vzorec a akci opakujte.",
-    "errorFrmlMaxReference": "Není možné vložit takovýto vzorec, protože obsahuje příliš mnoho hodnot,<br> odkazů na tabulky, a/nebo jmen.",
+    "errorFrmlMaxReference": "Takový vzorec není možné vložit, protože obsahuje příliš mnoho hodnot,<br> odkazů na tabulky nebo jmen.",
     "errorFrmlMaxTextLength": "Textová hodnota vzorce je limitována 255 znaky.<br>Použijte funkci CONCATENATE, nebo operátor zřetězení (&)",
     "errorFrmlWrongReferences": "Funkce odkazuje na na list který neexistuje.<br>Prosím, zkontrolujte data a akci opakujte.",
     "errorInvalidRef": "Zadejte správný název pro výběr nebo platnou referenci.",
@@ -235,7 +242,8 @@
     "unknownErrorText": "Neznámá chyba.",
     "uploadImageExtMessage": "Neznámý formát obrázku.",
     "uploadImageFileCountMessage": "Nenahrány žádné obrázky.",
-    "uploadImageSizeMessage": "Obrázek je příliš velký. Maximální velikost je 25 MB."
+    "uploadImageSizeMessage": "Obrázek je příliš velký. Maximální velikost je 25 MB.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "advDRMPassword": "Heslo",
@@ -276,7 +284,10 @@
     "txtEditingMode": "Nastavit režim úprav…",
     "uploadImageTextText": "Nahrávání obrázku...",
     "uploadImageTitleText": "Nahrávání obrázku",
-    "waitText": "Čekejte prosím..."
+    "waitText": "Čekejte prosím...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Statusbar": {
     "notcriticalErrorTitle": "Varování",
@@ -299,9 +310,9 @@
     "textRenameSheet": "Přejmenovat list",
     "textSheet": "List",
     "textSheetName": "Název listu",
+    "textTabColor": "Barva záložky",
     "textUnhide": "Odkrýt",
-    "textWarnDeleteSheet": "List může obsahovat data. Pokračovat v operaci? ",
-    "textTabColor": "Tab Color"
+    "textWarnDeleteSheet": "List může obsahovat data. Pokračovat v operaci? "
   },
   "Toolbar": {
     "dlgLeaveMsgText": "V tomto dokumentu máte neuložené změny. Klikněte na 'Zůstat na této stránce' a počkejte dokud nedojde k automatickému uložení. Klikněte na 'Opustit tuto stránku' pro zahození neuložených změn.",
@@ -367,7 +378,9 @@
       "txtNotUrl": "Toto pole by mělo obsahovat adresu URL ve formátu \"http://www.example.com\"",
       "txtSorting": "Řazení",
       "txtSortSelected": "Seřadit vybrané",
-      "txtYes": "Ano"
+      "txtYes": "Ano",
+      "textDone": "Done",
+      "textRecommended": "Recommended"
     },
     "Edit": {
       "notcriticalErrorTitle": "Varování",
@@ -400,7 +413,7 @@
       "textBottomBorder": "Dolní ohraničení",
       "textBringToForeground": "Přenést do popředí",
       "textCell": "Buňka",
-      "textCellStyles": "Styly buňky",
+      "textCellStyle": "Styl buňky",
       "textCenter": "Na střed",
       "textChart": "Graf",
       "textChartTitle": "Název grafu",
@@ -501,10 +514,7 @@
       "textPt": "pt",
       "textRange": "Rozsah",
       "textRemoveChart": "Odstranit graf",
-      "textRemoveImage": "Odstranit obrázek",
-      "textRemoveLink": "Odstranit odkaz",
       "textRemoveShape": "Odstranit obrazec",
-      "textReorder": "Změnit řazení",
       "textReplace": "Nahradit",
       "textReplaceImage": "Nahradit obrázek",
       "textRequired": "Požadováno",
@@ -549,7 +559,14 @@
       "textYen": "Jen",
       "txtNotUrl": "Toto pole by mělo obsahovat adresu URL ve formátu \"http://www.example.com\"",
       "txtSortHigh2Low": "Seřadit od nejvyššího po nejnižší",
-      "txtSortLow2High": "Seřadit od nejnižšího po nejvyšší"
+      "txtSortLow2High": "Seřadit od nejnižšího po nejvyšší",
+      "textArrange": "Arrange",
+      "textCancel": "Cancel",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
+      "textDone": "Done",
+      "textRecommended": "Recommended"
     },
     "Settings": {
       "advCSVOptions": "Vyberte možnosti CSV",
@@ -573,7 +590,7 @@
       "textChooseDelimeter": "Vyberte oddělovač",
       "textChooseEncoding": "Vybrat kódování",
       "textCollaboration": "Spolupráce",
-      "textColorSchemes": "Schémata barev",
+      "textColorSchemes": "Barevná schémata",
       "textComment": "Komentář",
       "textCommentingDisplay": "Zobrazení komentářů",
       "textComments": "Komentáře",
@@ -581,6 +598,7 @@
       "textCustomSize": "Vlastní velikost",
       "textDarkTheme": "Tmavý vzhled prostředí",
       "textDelimeter": "Oddělovač",
+      "textDirection": "Směr",
       "textDisableAll": "Vypnout vše",
       "textDisableAllMacrosWithNotification": "Vypnout všechna makra s notifikacemi",
       "textDisableAllMacrosWithoutNotification": "Vypnout všechna makra bez notifikací",
@@ -592,6 +610,7 @@
       "textEnableAllMacrosWithoutNotification": "Zapnout všechna makra bez notifikace",
       "textEncoding": "Kódování",
       "textExample": "Ukázka",
+      "textFeedback": "Zpětná vazba a Podpora",
       "textFind": "Najít",
       "textFindAndReplace": "Najít a nahradit",
       "textFindAndReplaceAll": "Najít a nahradit vše",
@@ -607,6 +626,7 @@
       "textLastModified": "Naposledy upraveno",
       "textLastModifiedBy": "Naposledy upravil(a)",
       "textLeft": "Vlevo",
+      "textLeftToRight": "Zleva doprava",
       "textLocation": "Umístění",
       "textLookIn": "Hledat v",
       "textMacrosSettings": "Nastavení maker",
@@ -622,12 +642,14 @@
       "textPortrait": "Na výšku",
       "textPoweredBy": "Poháněno",
       "textPrint": "Tisk",
-      "textR1C1Style": "Styl R1C1 reference",
+      "textR1C1Style": "Styl reference R1C1",
       "textRegionalSettings": "Místní nastavení",
       "textReplace": "Nahradit",
       "textReplaceAll": "Nahradit vše",
       "textResolvedComments": "Vyřešené komentáře",
+      "textRestartApplication": "Pro provedení změn restartujete aplikaci",
       "textRight": "Vpravo",
+      "textRightToLeft": "Zprava doleva",
       "textSearch": "Hledat",
       "textSearchBy": "Hledat",
       "textSearchIn": "Hledat v",
@@ -680,8 +702,7 @@
       "txtSemicolon": "Středník",
       "txtSpace": "Mezera",
       "txtTab": "Tabulátor",
-      "warnDownloadAs": "Pokud budete pokračovat v ukládání v tomto formátu, vše kromě textu bude ztraceno.<br>Opravdu chcete pokračovat?",
-      "textFeedback": "Feedback & Support"
+      "warnDownloadAs": "Pokud budete pokračovat v ukládání v tomto formátu, vše kromě textu bude ztraceno.<br>Opravdu chcete pokračovat?"
     }
   }
 }

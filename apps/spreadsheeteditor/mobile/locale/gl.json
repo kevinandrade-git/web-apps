@@ -3,6 +3,7 @@
     "textAbout": "Sobre",
     "textAddress": "Enderezo",
     "textBack": "Volver",
+    "textEditor": "Editor de follas de cálculo",
     "textEmail": "Correo electrónico",
     "textPoweredBy": "Desenvolvido por",
     "textTel": "Tel",
@@ -31,7 +32,8 @@
       "textReopen": "Volver a abrir",
       "textResolve": "Resolver",
       "textTryUndoRedo": "As funcións Desfacer/Refacer están activadas para o modo de coedición rápido.",
-      "textUsers": "Usuarios"
+      "textUsers": "Usuarios",
+      "textSharingSettings": "Sharing Settings"
     },
     "ThemeColorPalette": {
       "textCustomColors": "Cores personalizadas",
@@ -62,7 +64,10 @@
     "notcriticalErrorTitle": "Aviso",
     "textCopyCutPasteActions": "Accións de copiar, cortar e pegar",
     "textDoNotShowAgain": "Non amosar de novo",
-    "warnMergeLostData": "Na celda unida permanecerán só os datos da celda da esquina superior esquerda.<br>Ten a certeza de que quere continuar?"
+    "warnMergeLostData": "Na celda unida permanecerán só os datos da celda da esquina superior esquerda.<br>Ten a certeza de que quere continuar?",
+    "menuEditLink": "Edit Link",
+    "textOk": "Ok",
+    "txtWarnUrl": "Clicking this link can be harmful to your device and data.<br>Are you sure you want to continue?"
   },
   "Controller": {
     "Main": {
@@ -151,6 +156,7 @@
       "textRemember": "Lembrar a miña escolla",
       "textReplaceSkipped": "A substitución foi realizada. {0} ocorrencias foron ignoradas.",
       "textReplaceSuccess": "A busca foi realizada. Ocorrencias substituídas: {0}",
+      "textRequestMacros": "Unha macro fai unha petición á URL. Quere permitirlla a %1?",
       "textYes": "Si",
       "titleServerVersion": "Editor actualizado",
       "titleUpdateVersion": "Versión cambiada",
@@ -161,7 +167,8 @@
       "warnNoLicense": "Alcanzou o límite de conexións simultáneas con %1 editores. Este documento abrirase para as úa visualización. Póñase en contacto co equipo de vendas de %1 para coñecer as condicións de actualización persoal.",
       "warnNoLicenseUsers": "Alcanzou o límite de usuarios para os editores de %1.<br>Contacte co equipo de vendas de %1 para coñecer os termos de actualización persoal.",
       "warnProcessRightsChange": "Non ten permiso para editar o ficheiro.",
-      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?"
+      "titleLicenseExp": "License expired",
+      "warnLicenseExp": "Your license has expired. Please, update your license and refresh the page."
     }
   },
   "Error": {
@@ -235,7 +242,8 @@
     "unknownErrorText": "Erro descoñecido.",
     "uploadImageExtMessage": "Formato de imaxe descoñecido.",
     "uploadImageFileCountMessage": "Non hai imaxes subidas.",
-    "uploadImageSizeMessage": "A imaxe é demasiado grande. O tamaño máximo é de 25 MB."
+    "uploadImageSizeMessage": "A imaxe é demasiado grande. O tamaño máximo é de 25 MB.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "advDRMPassword": "Contrasinal",
@@ -276,7 +284,10 @@
     "txtEditingMode": "Establecer o modo de edición...",
     "uploadImageTextText": "Cargando imaxe...",
     "uploadImageTitleText": "Cargando imaxe",
-    "waitText": "Agarde..."
+    "waitText": "Agarde...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Statusbar": {
     "notcriticalErrorTitle": "Aviso",
@@ -292,16 +303,16 @@
     "textHide": "Agochar",
     "textMore": "Máis",
     "textMove": "Mover",
+    "textMoveBefore": "Mover antes da folla",
+    "textMoveToEnd": "(Mover á fin)",
     "textOk": "Aceptar",
     "textRename": "Renomear",
     "textRenameSheet": "Renomear folla",
     "textSheet": "Folla",
     "textSheetName": "Nome da folla",
+    "textTabColor": "Cor da lapela",
     "textUnhide": "Volver a amosar",
-    "textWarnDeleteSheet": "A folla de traballo pode que conteña datos. Queres continuar a operación?",
-    "textMoveBefore": "Move before sheet",
-    "textMoveToEnd": "(Move to end)",
-    "textTabColor": "Tab Color"
+    "textWarnDeleteSheet": "A folla de traballo pode que conteña datos. Queres continuar a operación?"
   },
   "Toolbar": {
     "dlgLeaveMsgText": "Ten cambios non gardados neste documento. Prema en \"Quedarse nesta páxina\" para esperar ata que se garden automaticamente. Prema en \"Saír desta páxina\" para descartar todos os cambios non gardados.",
@@ -325,16 +336,19 @@
       "sCatTextAndData": "Texto e datos",
       "textAddLink": "Engadir ligazón",
       "textAddress": "Enderezo",
+      "textAllTableHint": "Devolve todo o contido da táboa ou das columnas da táboa especificadas, incluíndo as cabeceiras das columnas, os datos e as filas totais",
       "textBack": "Volver",
       "textCancel": "Cancelar",
       "textChart": "Gráfico",
       "textComment": "Comentario",
+      "textDataTableHint": "Devolve as celas de datos da táboa ou das columnas da táboa especificadas",
       "textDisplay": "Amosar",
       "textEmptyImgUrl": "Necesita especificar a URL da imaxe.",
       "textExternalLink": "Ligazón externa",
       "textFilter": "Filtro",
       "textFunction": "Función",
       "textGroups": "Categorías",
+      "textHeadersTableHint": "Devolve as cabeceiras das columnas da táboa ou das columnas da táboa especificadas",
       "textImage": "Imaxe",
       "textImageURL": "URL da imaxe",
       "textInsert": "Inserir",
@@ -355,6 +369,8 @@
       "textShape": "Forma",
       "textSheet": "Folla",
       "textSortAndFilter": "Ordenar e filtrar",
+      "textThisRowHint": "Elixa só esta fila da columna especificada",
+      "textTotalsTableHint": "Devolve o total das filas da táboa ou das columnas da táboa especificadas",
       "txtExpand": "Expandir e ordenar",
       "txtExpandSort": "Os datos xunto á selección non se ordenarán. Quere ampliar a selección para incluír os datos adxacentes ou continuar ordenando só as celas seleccionadas actualmente?",
       "txtLockSort": "Atópanse datos xunto á súa selección, mais non ten permisos suficientes para modificar esas celdas.<br>Desexa continuar coa selección actual?",
@@ -363,11 +379,8 @@
       "txtSorting": "Ordenación",
       "txtSortSelected": "Ordenar os obxectos seleccionados",
       "txtYes": "Si",
-      "textAllTableHint": "Returns the entire contents of the table or specified table columns including column headers, data and total rows",
-      "textDataTableHint": "Returns the data cells of the table or specified table columns",
-      "textHeadersTableHint": "Returns the column headers for the table or specified table columns",
-      "textThisRowHint": "Choose only this row of the specified column",
-      "textTotalsTableHint": "Returns the total rows for the table or specified table columns"
+      "textDone": "Done",
+      "textRecommended": "Recommended"
     },
     "Edit": {
       "notcriticalErrorTitle": "Aviso",
@@ -400,7 +413,7 @@
       "textBottomBorder": "Bordo inferior",
       "textBringToForeground": "Traer ao primeiro plano",
       "textCell": "Celda",
-      "textCellStyles": "Estilos de celda",
+      "textCellStyle": "Estilo da celda",
       "textCenter": "Centro",
       "textChart": "Gráfico",
       "textChartTitle": "Título do gráfico",
@@ -501,10 +514,7 @@
       "textPt": "pt",
       "textRange": "Rango",
       "textRemoveChart": "Eliminar gráfico",
-      "textRemoveImage": "Eliminar imaxe",
-      "textRemoveLink": "Eliminar ligazón",
       "textRemoveShape": "Eliminar forma",
-      "textReorder": "Reordenar",
       "textReplace": "Substituír",
       "textReplaceImage": "Substituír imaxe",
       "textRequired": "Requirido",
@@ -549,7 +559,14 @@
       "textYen": "Ien",
       "txtNotUrl": "Este campo debe ser unha URL no formato \"http://www.example.com\"",
       "txtSortHigh2Low": "Ordenar de maior a menor",
-      "txtSortLow2High": "Ordenar de menor a maior "
+      "txtSortLow2High": "Ordenar de menor a maior ",
+      "textArrange": "Arrange",
+      "textCancel": "Cancel",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
+      "textDone": "Done",
+      "textRecommended": "Recommended"
     },
     "Settings": {
       "advCSVOptions": "Elexir os parámetros de CSV",
@@ -581,6 +598,7 @@
       "textCustomSize": "Tamaño personalizado",
       "textDarkTheme": "Tema escuro",
       "textDelimeter": "Delimitador",
+      "textDirection": "Dirección ",
       "textDisableAll": "Desactivar todo",
       "textDisableAllMacrosWithNotification": "Desactivar todas as macros con notificación",
       "textDisableAllMacrosWithoutNotification": "Desactivar todas as macros sen notificación",
@@ -592,6 +610,7 @@
       "textEnableAllMacrosWithoutNotification": "Activar todas as macros sen notificación",
       "textEncoding": "Codificación",
       "textExample": "Exemplo",
+      "textFeedback": "Comentarios e soporte",
       "textFind": "Buscar",
       "textFindAndReplace": "Buscar e reemprazar",
       "textFindAndReplaceAll": "Buscar e reemprazar todo",
@@ -607,6 +626,7 @@
       "textLastModified": "Última modificación",
       "textLastModifiedBy": "Última modificación por",
       "textLeft": "Á esquerda",
+      "textLeftToRight": "Da esquerda para a dereita",
       "textLocation": "Ubicación",
       "textLookIn": "Buscar en ",
       "textMacrosSettings": "Configuración das macros",
@@ -627,7 +647,9 @@
       "textReplace": "Substituír",
       "textReplaceAll": "Substituír todo",
       "textResolvedComments": "Comentarios resoltos.",
+      "textRestartApplication": "Reinicie o aplicativo para que os cambios teñan efecto",
       "textRight": "Á dereita",
+      "textRightToLeft": "Da dereita á esquerda",
       "textSearch": "Buscar",
       "textSearchBy": "Buscar",
       "textSearchIn": "Buscar en",
@@ -680,8 +702,7 @@
       "txtSemicolon": "Punto e coma",
       "txtSpace": "Espazo",
       "txtTab": "Lapela",
-      "warnDownloadAs": "Se segue gardando neste formato, todas as características a excepción do texto perderanse.<br>Te na certeza de que desexa continuar?",
-      "textFeedback": "Feedback & Support"
+      "warnDownloadAs": "Se segue gardando neste formato, todas as características a excepción do texto perderanse.<br>Te na certeza de que desexa continuar?"
     }
   }
 }

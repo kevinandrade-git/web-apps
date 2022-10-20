@@ -119,9 +119,15 @@ define([
             me._state = {wsLock: false, wsProps: []};
             me.fastcoauthtips = [];
             me._TtHeight = 20;
+            me.externalData = {
+                stackRequests: [],
+                stackResponse: [],
+                callback: undefined
+            };
             /** coauthoring begin **/
             this.wrapEvents = {
-                apiHideComment: _.bind(this.onApiHideComment, this)
+                apiHideComment: _.bind(this.onApiHideComment, this),
+                onKeyUp: _.bind(this.onKeyUp, this)
             };
             /** coauthoring end **/
 
@@ -183,6 +189,7 @@ define([
                 'protect:wslock': _.bind(me.onChangeProtectSheet, me)
             });
             Common.Gateway.on('processmouse', _.bind(me.onProcessMouse, me));
+            Common.Gateway.on('setactionlink', _.bind(me.onSetActionLink, me));
         },
 
         onCreateDelayedElements: function(view) {
@@ -259,6 +266,7 @@ define([
                 view.tableTotalMenu.on('item:click',                _.bind(me.onTotalMenuClick, me));
                 view.menuImgMacro.on('click',                       _.bind(me.onImgMacro, me));
                 view.menuImgEditPoints.on('click',                  _.bind(me.onImgEditPoints, me));
+                view.pmiGetRangeList.on('click',                    _.bind(me.onGetLink, me));
 
                 if (!me.permissions.isEditMailMerge && !me.permissions.isEditDiagram && !me.permissions.isEditOle) {
                     var oleEditor = me.getApplication().getController('Common.Controllers.ExternalOleEditor').getView('Common.Views.ExternalOleEditor');
@@ -274,6 +282,7 @@ define([
                         oleEditor.on('hide', _.bind(function(cmp, message) {
                             if (me.api) {
                                 me.api.asc_enableKeyEvents(true);
+                                me.api.asc_onCloseChartFrame();
                             }
                             setTimeout(function(){
                                 view.fireEvent('editcomplete', view);
@@ -369,6 +378,10 @@ define([
                 this.api.asc_registerCallback('asc_onShowPivotGroupDialog', _.bind(this.onShowPivotGroupDialog, this));
                 if (!this.permissions.isEditMailMerge && !this.permissions.isEditDiagram && !this.permissions.isEditOle)
                     this.api.asc_registerCallback('asc_doubleClickOnTableOleObject', _.bind(this.onDoubleClickOnTableOleObject, this));
+                if (this.permissions.canRequestReferenceData) {
+                    this.api.asc_registerCallback('asc_onUpdateExternalReference', _.bind(this.onUpdateExternalReference, this));
+                    Common.Gateway.on('setreferencedata', _.bind(this.setReferenceData, this));
+                }
             }
             this.api.asc_registerCallback('asc_onShowForeignCursorLabel',       _.bind(this.onShowForeignCursorLabel, this));
             this.api.asc_registerCallback('asc_onHideForeignCursorLabel',       _.bind(this.onHideForeignCursorLabel, this));
@@ -1156,6 +1169,33 @@ define([
             this.api && this.api.asc_editPointsGeometry();
         },
 
+        onGetLink: function(item) {
+            if (this.api) {
+                var range = this.api.asc_getActiveRangeStr(Asc.referenceType.A, false, true),
+                    name = this.api.asc_getEscapeSheetName(this.api.asc_getWorksheetName(this.api.asc_getActiveWorksheetIndex()));
+                name = (name + ((name!=='' && range!=='') ? '!' : '') + range);
+                name && Common.Gateway.requestMakeActionLink({
+                    action: {
+                        type: "internallink", data: name
+                    }
+                });
+            }
+        },
+
+        onSetActionLink: function (url) {
+            if (Common.Utils.InternalSettings.get("sse-dialog-link-visible"))
+                return;
+
+            var me = this;
+            navigator.clipboard && navigator.clipboard.writeText(url)
+                .then(function() {
+                    Common.NotificationCenter.trigger('showmessage', {msg: me.txtCopySuccess}, {timeout: 3000, hideCloseTip: true});
+                })
+                .catch(function(err) {
+                    console.log(err);
+                });
+        },
+
         onApiCoAuthoringDisconnect: function() {
             this.permissions.isEdit = false;
         },
@@ -1258,6 +1298,9 @@ define([
                         row_columnTip.isHidden = true;
                     }
                 }
+                if (!index_foreign) {
+                    me.hideForeignSelectTips();
+                }
                 if (me.permissions.isEdit || me.permissions.canViewComments) {
                     if (!index_comments || this.popupmenu) {
                         commentTip.moveCommentId = undefined;
@@ -1277,9 +1320,6 @@ define([
                 if (me.permissions.isEdit) {
                     if (!index_locked) {
                         me.hideCoAuthTips();
-                    }
-                    if (!index_foreign) {
-                        me.hideForeignSelectTips();
                     }
                     if (index_slicer===undefined) {
                         if (!slicerTip.isHidden && slicerTip.ref) {
@@ -1480,48 +1520,47 @@ define([
                             }
                         }
                     }
-                    if (index_foreign && me.isUserVisible(dataarray[index_foreign-1].asc_getUserId())) {
-                        data = dataarray[index_foreign-1];
+                }
+                if (index_foreign && me.isUserVisible(dataarray[index_foreign-1].asc_getUserId())) {
+                    data = dataarray[index_foreign-1];
 
-                        if (!coAuthTip.XY)
-                            me.onDocumentResize();
+                    if (!coAuthTip.XY)
+                        me.onDocumentResize();
 
-                        if (foreignSelect.x_point != data.asc_getX() || foreignSelect.y_point != data.asc_getY()) {
-                            me.hideForeignSelectTips();
+                    if (foreignSelect.x_point != data.asc_getX() || foreignSelect.y_point != data.asc_getY()) {
+                        me.hideForeignSelectTips();
 
-                            foreignSelect.x_point = data.asc_getX();
-                            foreignSelect.y_point = data.asc_getY();
+                        foreignSelect.x_point = data.asc_getX();
+                        foreignSelect.y_point = data.asc_getY();
 
-                            var src = $(document.createElement("div")),
-                                color = data.asc_getColor();
-                            foreignSelect.ref = src;
-                            foreignSelect.userId = data.asc_getUserId();
+                        var src = $(document.createElement("div")),
+                            color = data.asc_getColor();
+                        foreignSelect.ref = src;
+                        foreignSelect.userId = data.asc_getUserId();
 
-                            src.addClass('username-tip');
-                            src.css({
-                                height      : foreignSelect.ttHeight + 'px',
-                                position    : 'absolute',
-                                zIndex      : '900',
-                                visibility  : 'visible',
-                                'background-color': '#'+Common.Utils.ThemeColor.getHexColor(color.get_r(), color.get_g(), color.get_b())
-                            });
-                            $(document.body).append(src);
+                        src.addClass('username-tip');
+                        src.css({
+                            height      : foreignSelect.ttHeight + 'px',
+                            position    : 'absolute',
+                            zIndex      : '900',
+                            visibility  : 'visible',
+                            'background-color': '#'+Common.Utils.ThemeColor.getHexColor(color.get_r(), color.get_g(), color.get_b())
+                        });
+                        $(document.body).append(src);
 
-                            showPoint = [
-                                foreignSelect.x_point + coAuthTip.XY[0],
-                                foreignSelect.y_point + coAuthTip.XY[1] - foreignSelect.ttHeight
-                            ];
+                        showPoint = [
+                            foreignSelect.x_point + coAuthTip.XY[0],
+                            foreignSelect.y_point + coAuthTip.XY[1] - foreignSelect.ttHeight
+                        ];
 
-                            src.text(me.getUserName(data.asc_getUserId()));
-                            src.css({
-                                visibility  : 'visible',
-                                left       : ((showPoint[0]+foreignSelect.ref.outerWidth()>coAuthTip.bodyWidth-coAuthTip.rightMenuWidth) ? coAuthTip.bodyWidth-coAuthTip.rightMenuWidth-foreignSelect.ref.outerWidth() : showPoint[0]) + 'px',
-                                top         : showPoint[1] + 'px'
-                            });
-                        }
+                        src.text(me.getUserName(data.asc_getUserId()));
+                        src.css({
+                            visibility  : 'visible',
+                            left       : ((showPoint[0]+foreignSelect.ref.outerWidth()>coAuthTip.bodyWidth-coAuthTip.rightMenuWidth) ? coAuthTip.bodyWidth-coAuthTip.rightMenuWidth-foreignSelect.ref.outerWidth() : showPoint[0]) + 'px',
+                            top         : showPoint[1] + 'px'
+                        });
                     }
                 }
-
                 if (index_filter!==undefined && !(me.dlgFilter && me.dlgFilter.isVisible()) && !(me.currentMenu && me.currentMenu.isVisible()) && !dataarray[index_filter-1].asc_getFilter().asc_getPivotObj()) {
                     if (!filterTip.parentEl) {
                         filterTip.parentEl = $('<div id="tip-container-filtertip" style="position: absolute; z-index: 10000;"></div>');
@@ -1632,7 +1671,8 @@ define([
                 });
                 return;
             }
-            if (this.api.asc_getUrlType(url)>0)
+            var type = this.api.asc_getUrlType(url);
+            if (type===AscCommon.c_oAscUrlType.Http || type===AscCommon.c_oAscUrlType.Email)
                 window.open(url, '_blank');
             else
                 Common.UI.warning({
@@ -1808,7 +1848,8 @@ define([
                     me.documentHolder.cmpEl.offset().top  - $(window).scrollTop()
                 ];
                 me.tooltips.coauth.apiHeight = me.documentHolder.cmpEl.height();
-                me.tooltips.coauth.rightMenuWidth = $('#right-menu').width();
+                var rightMenu = $('#right-menu');
+                me.tooltips.coauth.rightMenuWidth = rightMenu.is(':visible') ? rightMenu.width() : 0;
                 me.tooltips.coauth.bodyWidth = $(window).width();
                 me.tooltips.coauth.bodyHeight = $(window).height();
             }
@@ -1821,12 +1862,12 @@ define([
                     delta = e.deltaY;
                 }
 
-                if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+                if (e.ctrlKey && !e.altKey) {
                     var factor = this.api.asc_getZoom();
                     if (delta < 0) {
                         factor = Math.ceil(factor * 10)/10;
                         factor -= 0.1;
-                        if (!(factor < .5)) {
+                        if (!(factor < .1)) {
                             this.api.asc_setZoom(factor);
                         }
                     } else if (delta > 0) {
@@ -1846,6 +1887,9 @@ define([
         onDocumentKeyDown: function(event){
             if (this.api){
                 var key = event.keyCode;
+                if (this.hkSpecPaste) {
+                    this._needShowSpecPasteMenu = !event.shiftKey && !event.altKey && event.keyCode == Common.UI.Keys.CTRL;
+                }
                 if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey){
                     if (key === Common.UI.Keys.NUM_PLUS || key === Common.UI.Keys.EQUALITY || (Common.Utils.isGecko && key === Common.UI.Keys.EQUALITY_FF) || (Common.Utils.isOpera && key == 43)){
                         if (!this.api.isCellEdited) {
@@ -1858,15 +1902,23 @@ define([
                             event.preventDefault();
                             event.stopPropagation();
                             return false;
+                        } else if (this.permissions.isEditMailMerge || this.permissions.isEditDiagram || this.permissions.isEditOle) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            return false;
                         }
                     } else if (key === Common.UI.Keys.NUM_MINUS || key === Common.UI.Keys.MINUS || (Common.Utils.isGecko && key === Common.UI.Keys.MINUS_FF) || (Common.Utils.isOpera && key == 45)){
                         if (!this.api.isCellEdited) {
                             factor = Math.ceil(this.api.asc_getZoom() * 10)/10;
                             factor -= .1;
-                            if (!(factor < .5)) {
+                            if (!(factor < .1)) {
                                 this.api.asc_setZoom(factor);
                             }
 
+                            event.preventDefault();
+                            event.stopPropagation();
+                            return false;
+                        } else if (this.permissions.isEditMailMerge || this.permissions.isEditDiagram || this.permissions.isEditOle) {
                             event.preventDefault();
                             event.stopPropagation();
                             return false;
@@ -2305,6 +2357,8 @@ define([
                 documentHolder.pmiAdvancedNumFormat.options.numformatinfo = documentHolder.pmiNumFormat.menu.options.numformatinfo = xfs.asc_getNumFormatInfo();
                 documentHolder.pmiAdvancedNumFormat.options.numformat = xfs.asc_getNumFormat();
 
+                documentHolder.pmiGetRangeList.setVisible(!Common.Utils.isIE && iscellmenu && !iscelledit && !ismultiselect && !internaleditor && this.permissions.canMakeActionLink && !!navigator.clipboard);
+
                 _.each(documentHolder.ssMenu.items, function(item) {
                     item.setDisabled(isCellLocked);
                 });
@@ -2334,6 +2388,7 @@ define([
                 documentHolder.pmiEntriesList.setDisabled(isCellLocked || this._state.wsLock);
                 documentHolder.pmiAddNamedRange.setDisabled(isCellLocked || this._state.wsLock);
                 documentHolder.pmiAddComment.setDisabled(isCellLocked || this._state.wsProps['Objects']);
+                documentHolder.pmiGetRangeList.setDisabled(false);
 
                 if (inPivot) {
                     var canGroup = this.api.asc_canGroupPivot();
@@ -2342,6 +2397,11 @@ define([
                 }
 
                 if (showMenu) this.showPopupMenu(documentHolder.ssMenu, {}, event);
+
+                documentHolder.pmiFunctionSeparator.setVisible(documentHolder.pmiInsFunction.isVisible() || documentHolder.menuAddHyperlink.isVisible() || documentHolder.menuHyperlink.isVisible() ||
+                                                                isrowmenu || iscolmenu || isallmenu);
+                documentHolder.pmiFreezeSeparator.setVisible(documentHolder.pmiFreezePanes.isVisible());
+
             } else if (this.permissions.isEditDiagram && seltype == Asc.c_oAscSelectionType.RangeChartText) {
                 if (!showMenu && !documentHolder.textInShapeMenu.isVisible()) return;
 
@@ -2938,14 +2998,16 @@ define([
                 me._arrSpecialPaste[Asc.c_oSpecialPasteProps.useTextImport] = [me.txtUseTextImport, 3];
 
                 pasteContainer = $('<div id="special-paste-container" style="position: absolute;"><div id="id-document-holder-btn-special-paste"></div></div>');
-                documentHolderView.cmpEl.append(pasteContainer);
+                documentHolderView.cmpEl.find('#ws-canvas-outer').append(pasteContainer);
 
                 me.btnSpecialPaste = new Common.UI.Button({
                     parentEl: $('#id-document-holder-btn-special-paste'),
                     cls         : 'btn-toolbar',
                     iconCls     : 'toolbar__icon btn-paste',
+                    caption     : Common.Utils.String.platformKey('Ctrl', '({0})'),
                     menu        : new Common.UI.Menu({items: []})
                 });
+                me.initSpecialPasteEvents();
             }
 
             if (pasteItems.length>0) {
@@ -2963,49 +3025,19 @@ define([
                 _.each(pasteItems, function(menuItem, index) {
                     if (menuItem == Asc.c_oSpecialPasteProps.useTextImport) {
                         importText = new Common.UI.MenuItem({
-                            caption: me._arrSpecialPaste[menuItem][0],
+                            caption: me._arrSpecialPaste[menuItem][0] + (me.hkSpecPaste[menuItem] ? ' (' + me.hkSpecPaste[menuItem] + ')' : ''),
                             value: menuItem,
                             checkable: true,
                             toggleGroup : 'specialPasteGroup'
-                        }).on('click', function(item, e) {
-                            (new Common.Views.OpenDialog({
-                                title: me.txtImportWizard,
-                                closable: true,
-                                type: Common.Utils.importTextType.Paste,
-                                preview: true,
-                                api: me.api,
-                                handler: function (result, settings) {
-                                    if (result == 'ok') {
-                                        if (me && me.api) {
-                                            var props = new Asc.SpecialPasteProps();
-                                            props.asc_setProps(Asc.c_oSpecialPasteProps.useTextImport);
-                                            props.asc_setAdvancedOptions(settings.textOptions);
-                                            me.api.asc_SpecialPaste(props);
-                                        }
-                                        me._state.lastSpecPasteChecked = item;
-                                    } else {
-                                        item.setChecked(false, true);
-                                        me._state.lastSpecPasteChecked && me._state.lastSpecPasteChecked.setChecked(true, true);
-                                    }
-                                }
-                            })).show();
-                            setTimeout(function(){menu.hide();}, 100);
-                        });
+                        }).on('click', _.bind(me.onSpecialPasteItemClick, me));
                         me._arrSpecialPaste[menuItem][2] = importText;
                     } else if (me._arrSpecialPaste[menuItem]) {
                         var mnu = new Common.UI.MenuItem({
-                            caption: me._arrSpecialPaste[menuItem][0],
+                            caption: me._arrSpecialPaste[menuItem][0] + (me.hkSpecPaste[menuItem] ? ' (' + me.hkSpecPaste[menuItem] + ')' : ''),
                             value: menuItem,
                             checkable: true,
                             toggleGroup : 'specialPasteGroup'
-                        }).on('click', function(item, e) {
-                            me._state.lastSpecPasteChecked = item;
-
-                            var props = new Asc.SpecialPasteProps();
-                            props.asc_setProps(item.value);
-                            me.api.asc_SpecialPaste(props);
-                            setTimeout(function(){menu.hide();}, 100);
-                        });
+                        }).on('click', _.bind(me.onSpecialPasteItemClick, me));
                         groups[me._arrSpecialPaste[menuItem][1]].push(mnu);
                         me._arrSpecialPaste[menuItem][2] = mnu;
                     }
@@ -3056,6 +3088,7 @@ define([
 
             if ( coord[0].asc_getX()<0 || coord[0].asc_getY()<0) {
                 if (pasteContainer.is(':visible')) pasteContainer.hide();
+                $(document).off('keyup', this.wrapEvents.onKeyUp);
                 return;
             }
 
@@ -3081,12 +3114,119 @@ define([
 
             pasteContainer.css({left: showPoint[0], top : showPoint[1]});
             pasteContainer.show();
+            setTimeout(function() {
+                $(document).on('keyup', me.wrapEvents.onKeyUp);
+            }, 10);
         },
 
         onHideSpecialPasteOptions: function() {
             var pasteContainer = this.documentHolder.cmpEl.find('#special-paste-container');
-            if (pasteContainer.is(':visible'))
+            if (pasteContainer.is(':visible')) {
                 pasteContainer.hide();
+                $(document).off('keyup', this.wrapEvents.onKeyUp);
+            }
+        },
+
+        onSpecialPasteItemClick: function(item, e) {
+            var me = this,
+                menu = this.btnSpecialPaste.menu;
+            if (item.value == Asc.c_oSpecialPasteProps.useTextImport) {
+                (new Common.Views.OpenDialog({
+                    title: me.txtImportWizard,
+                    closable: true,
+                    type: Common.Utils.importTextType.Paste,
+                    preview: true,
+                    api: me.api,
+                    handler: function (result, settings) {
+                        if (result == 'ok') {
+                            if (me && me.api) {
+                                var props = new Asc.SpecialPasteProps();
+                                props.asc_setProps(Asc.c_oSpecialPasteProps.useTextImport);
+                                props.asc_setAdvancedOptions(settings.textOptions);
+                                me.api.asc_SpecialPaste(props);
+                            }
+                            me._state.lastSpecPasteChecked = item;
+                        } else if (item.cmpEl) {
+                            item.setChecked(false, true);
+                            me._state.lastSpecPasteChecked && me._state.lastSpecPasteChecked.setChecked(true, true);
+                        }
+                    }
+                })).show();
+                setTimeout(function(){menu.hide();}, 100);
+            } else {
+                me._state.lastSpecPasteChecked = item;
+                var props = new Asc.SpecialPasteProps();
+                props.asc_setProps(item.value);
+                me.api.asc_SpecialPaste(props);
+                setTimeout(function(){menu.hide();}, 100);
+            }
+            if (!item.cmpEl && me._state.lastSpecPasteChecked) {
+                for (var i = 0; i < menu.items.length; i++) {
+                    menu.items[i].setChecked(menu.items[i].value===me._state.lastSpecPasteChecked.value, true);
+                    if (menu.items[i].value===me._state.lastSpecPasteChecked.value)
+                        me._state.lastSpecPasteChecked = menu.items[i];
+                }
+            }
+            return false;
+        },
+
+        onKeyUp: function (e) {
+            if (e.keyCode == Common.UI.Keys.CTRL && this._needShowSpecPasteMenu && !this.btnSpecialPaste.menu.isVisible() && /area_id/.test(e.target.id)) {
+                $('button', this.btnSpecialPaste.cmpEl).click();
+                e.preventDefault();
+            }
+            this._needShowSpecPasteMenu = false;
+        },
+
+        initSpecialPasteEvents: function() {
+            var me = this;
+            me.hkSpecPaste = [];
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.paste] = 'P';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.pasteOnlyFormula] = 'F';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.formulaNumberFormat] = 'O';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.formulaAllFormatting] = 'K';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.formulaWithoutBorders] = 'B';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.formulaColumnWidth] = 'W';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.mergeConditionalFormating] = 'G';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.transpose] = 'T';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.pasteOnlyValues] = 'V';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.valueNumberFormat] = 'A';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.valueAllFormating] = 'E';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.pasteOnlyFormating] = 'R';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.link] = 'N';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.picture] = 'U';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.linkedPicture] = 'I';
+
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.sourceformatting] = 'K';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.destinationFormatting] = 'M';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.keepTextOnly] = 'T';
+            // me.hkSpecPaste[Asc.c_oSpecialPasteProps.useTextImport] = '';
+
+            var str = '';
+            for(var key in me.hkSpecPaste){
+                if(me.hkSpecPaste.hasOwnProperty(key)){
+                    if (str.indexOf(me.hkSpecPaste[key])<0)
+                        str += me.hkSpecPaste[key] + ',';
+                }
+            }
+            str = str.substring(0, str.length-1)
+            var keymap = {};
+            keymap[str] = _.bind(function(e) {
+                var menu = this.btnSpecialPaste.menu;
+                for (var i = 0; i < menu.items.length; i++) {
+                    if (this.hkSpecPaste[menu.items[i].value] === String.fromCharCode(e.keyCode)) {
+                        return me.onSpecialPasteItemClick({value: menu.items[i].value});
+                    }
+                }
+            }, me);
+            Common.util.Shortcuts.delegateShortcuts({shortcuts:keymap});
+            Common.util.Shortcuts.suspendEvents(str, undefined, true);
+
+            me.btnSpecialPaste.menu.on('show:after', function(menu) {
+                Common.util.Shortcuts.resumeEvents(str);
+            }).on('hide:after', function(menu) {
+                Common.util.Shortcuts.suspendEvents(str, undefined, true);
+            });
         },
 
         onToggleAutoCorrectOptions: function(autoCorrectOptions) {
@@ -4082,6 +4222,51 @@ define([
             }
         },
 
+        onUpdateExternalReference: function(arr, callback) {
+            if (this.permissions.isEdit && !this._isDisabled) {
+                var me = this;
+                me.externalData = {
+                    stackRequests: [],
+                    stackResponse: [],
+                    callback: undefined
+                };
+                arr && arr.length>0 && arr.forEach(function(item) {
+                    var data;
+                    switch (item.asc_getType()) {
+                        case Asc.c_oAscExternalReferenceType.link:
+                            data = {link: item.asc_getData()};
+                            break;
+                        case Asc.c_oAscExternalReferenceType.path:
+                            data = {path: item.asc_getData()};
+                            break;
+                        case Asc.c_oAscExternalReferenceType.referenceData:
+                            data = {referenceData: item.asc_getData()};
+                            break;
+                    }
+                    data && me.externalData.stackRequests.push(data);
+                });
+                me.externalData.callback = callback;
+                me.requestReferenceData();
+            }
+        },
+
+        requestReferenceData: function() {
+            if (this.externalData.stackRequests.length>0) {
+                var data = this.externalData.stackRequests.shift();
+                Common.Gateway.requestReferenceData(data);
+            }
+        },
+
+        setReferenceData: function(data) {
+            if (this.permissions.isEdit && !this._isDisabled) {
+                data && this.externalData.stackResponse.push(data);
+                if (this.externalData.stackRequests.length>0)
+                    this.requestReferenceData();
+                else if (this.externalData.callback)
+                    this.externalData.callback(this.externalData.stackResponse);
+            }
+        },
+
         getUserName: function(id){
             var usersStore = SSE.getCollection('Common.Collections.Users');
             if (usersStore){
@@ -4263,7 +4448,8 @@ define([
         txtAllTableHint: 'Returns the entire contents of the table or specified table columns including column headers, data and total rows',
         txtDataTableHint: 'Returns the data cells of the table or specified table columns',
         txtHeadersTableHint: 'Returns the column headers for the table or specified table columns',
-        txtTotalsTableHint: 'Returns the total rows for the table or specified table columns'
+        txtTotalsTableHint: 'Returns the total rows for the table or specified table columns',
+        txtCopySuccess: 'Link copied to the clipboard'
 
     }, SSE.Controllers.DocumentHolder || {}));
 });

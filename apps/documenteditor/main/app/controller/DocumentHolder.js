@@ -143,7 +143,8 @@ define([
             me.userTooltip = true;
             me.wrapEvents = {
                 userTipMousover: _.bind(me.userTipMousover, me),
-                userTipMousout: _.bind(me.userTipMousout, me)
+                userTipMousout: _.bind(me.userTipMousout, me),
+                onKeyUp: _.bind(me.onKeyUp, me)
             };
 
             var keymap = {};
@@ -186,6 +187,7 @@ define([
                     me.onDocumentHolderResize();
                 }
             });
+            Common.NotificationCenter.on('protect:doclock', _.bind(me.onChangeProtectDocument, me));
         },
 
         setApi: function(o) {
@@ -225,7 +227,6 @@ define([
                     this.api.asc_registerCallback('asc_onShowContentControlsActions',_.bind(this.onShowContentControlsActions, this));
                     this.api.asc_registerCallback('asc_onHideContentControlsActions',_.bind(this.onHideContentControlsActions, this));
                 }
-
                 this.documentHolder.setApi(this.api);
             }
 
@@ -311,13 +312,15 @@ define([
                     var command = message.data.command;
                     var data = message.data.data;
                     if (this.api) {
-                        if (oleEditor.isEditMode())
-                            this.api.asc_editTableOleObject(data);
+                        oleEditor.isEditMode()
+                            ? this.api.asc_editTableOleObject(data)
+                            : this.api.asc_addTableOleObject(data);
                     }
                 }, this));
                 oleEditor.on('hide', _.bind(function(cmp, message) {
                     if (this.api) {
                         this.api.asc_enableKeyEvents(true);
+                        this.api.asc_onCloseChartFrame();
                     }
                     setTimeout(function(){
                         me.editComplete();
@@ -420,6 +423,10 @@ define([
             view.menuTableTOC.menu.on('item:click', _.bind(me.onTOCMenu, me));
             view.menuParaTOCRefresh.menu.on('item:click', _.bind(me.onTOCMenu, me));
             view.menuParaTOCSettings.on('click', _.bind(me.onParaTOCSettings, me));
+            view.menuTableEquation.menu.on('item:click', _.bind(me.convertEquation, me));
+            view.menuParagraphEquation.menu.on('item:click', _.bind(me.convertEquation, me));
+
+            me.onChangeProtectDocument();
         },
 
         getView: function (name) {
@@ -580,7 +587,9 @@ define([
         showObjectMenu: function(event, docElement, eOpts){
             var me = this;
             if (me.api){
-                var obj = (me.mode.isEdit && !me._isDisabled) ? me.fillMenuProps(me.api.getSelectedElements()) : me.fillViewMenuProps(me.api.getSelectedElements());
+                var docProtection = me.documentHolder._docProtection;
+                var obj = (me.mode.isEdit && !(me._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly)) ?
+                            me.fillMenuProps(me.api.getSelectedElements()) : me.fillViewMenuProps(me.api.getSelectedElements());
                 if (obj) me.showPopupMenu(obj.menu_to_show, obj.menu_props, event, docElement, eOpts);
             }
         },
@@ -607,7 +616,9 @@ define([
             var me = this,
                 currentMenu = me.documentHolder.currentMenu;
             if (currentMenu && currentMenu.isVisible() && currentMenu !== me.documentHolder.hdrMenu){
-                var obj = (me.mode.isEdit && !me._isDisabled) ? me.fillMenuProps(selectedElements) : me.fillViewMenuProps(selectedElements);
+                var docProtection = me.documentHolder._docProtection;
+                var obj = (me.mode.isEdit && !(me._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly)) ?
+                            me.fillMenuProps(selectedElements) : me.fillViewMenuProps(selectedElements);
                 if (obj) {
                     if (obj.menu_to_show===currentMenu) {
                         currentMenu.options.initMenu(obj.menu_props);
@@ -625,7 +636,7 @@ define([
                     delta = event.deltaY;
                 }
 
-                if ((event.ctrlKey || event.metaKey) && !event.altKey) {
+                if (event.ctrlKey && !event.altKey) {
                     if (delta < 0) {
                         me.api.zoomOut();
                     } else if (delta > 0) {
@@ -642,6 +653,9 @@ define([
             var me = this;
             if (me.api){
                 var key = event.keyCode;
+                if (me.hkSpecPaste) {
+                    me._needShowSpecPasteMenu = !event.shiftKey && !event.altKey && event.keyCode == Common.UI.Keys.CTRL;
+                }
                 if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey){
                     if (key === Common.UI.Keys.NUM_PLUS || key === Common.UI.Keys.EQUALITY || (Common.Utils.isGecko && key === Common.UI.Keys.EQUALITY_FF) || (Common.Utils.isOpera && key == 43)){
                         me.api.zoomIn();
@@ -797,13 +811,13 @@ define([
         },
 
         onHyperlinkClick: function(url) {
-            var me = this;
             if (url) {
-                if (me.api.asc_getUrlType(url)>0)
+                var type = this.api.asc_getUrlType(url);
+                if (type===AscCommon.c_oAscUrlType.Http || type===AscCommon.c_oAscUrlType.Email)
                     window.open(url);
                 else
                     Common.UI.warning({
-                        msg: me.documentHolder.txtWarnUrl,
+                        msg: this.documentHolder.txtWarnUrl,
                         buttons: ['yes', 'no'],
                         primary: 'yes',
                         callback: function(btn) {
@@ -816,7 +830,8 @@ define([
         onDialogAddHyperlink: function() {
             var me = this;
             var win, props, text;
-            if (me.api && me.mode.isEdit && !me._isDisabled && !me.getApplication().getController('LeftMenu').leftMenu.menuFile.isVisible()){
+            var docProtection = me.documentHolder._docProtection;
+            if (me.api && me.mode.isEdit && !(me._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly) && !me.getApplication().getController('LeftMenu').leftMenu.menuFile.isVisible()){
                 var handlerDlg = function(dlg, result) {
                     if (result == 'ok') {
                         props = dlg.getSettings();
@@ -993,7 +1008,7 @@ define([
                         ToolTip = Common.Utils.String.htmlEncode(ToolTip);
 
                     if (screenTip.tipType !== type || screenTip.tipLength !== ToolTip.length || screenTip.strTip.indexOf(ToolTip)<0 ) {
-                        screenTip.toolTip.setTitle((type==Asc.c_oAscMouseMoveDataTypes.Hyperlink) ? (ToolTip + '<br><b>' + me.documentHolder.txtPressLink + '</b>') : ToolTip);
+                        screenTip.toolTip.setTitle((type==Asc.c_oAscMouseMoveDataTypes.Hyperlink) ? (ToolTip + '<br><b>' + Common.Utils.String.platformKey('Ctrl', me.documentHolder.txtPressLink) + '</b>') : ToolTip);
                         screenTip.tipLength = ToolTip.length;
                         screenTip.strTip = ToolTip;
                         screenTip.tipType = type;
@@ -1086,8 +1101,10 @@ define([
                     parentEl: $('#id-document-holder-btn-special-paste'),
                     cls         : 'btn-toolbar',
                     iconCls     : 'toolbar__icon btn-paste',
+                    caption     : Common.Utils.String.platformKey('Ctrl', '({0})'),
                     menu        : new Common.UI.Menu({items: []})
                 });
+                me.initSpecialPasteEvents();
             }
 
             if (pasteItems.length>0) {
@@ -1100,20 +1117,18 @@ define([
                 var group_prev = -1;
                 _.each(pasteItems, function(menuItem, index) {
                     var mnu = new Common.UI.MenuItem({
-                        caption: me._arrSpecialPaste[menuItem],
+                        caption: me._arrSpecialPaste[menuItem] + ' (' + me.hkSpecPaste[menuItem] + ')',
                         value: menuItem,
                         checkable: true,
                         toggleGroup : 'specialPasteGroup'
-                    }).on('click', function(item, e) {
-                        me.api.asc_SpecialPaste(item.value);
-                        setTimeout(function(){menu.hide();}, 100);
-                    });
+                    }).on('click', _.bind(me.onSpecialPasteItemClick, me));
                     menu.addItem(mnu);
                 });
                 (menu.items.length>0) && menu.items[0].setChecked(true, true);
             }
             if (coord.asc_getX()<0 || coord.asc_getY()<0) {
                 if (pasteContainer.is(':visible')) pasteContainer.hide();
+                $(document).off('keyup', this.wrapEvents.onKeyUp);
             } else {
                 var showPoint = [coord.asc_getX() + coord.asc_getWidth() + 3, coord.asc_getY() + coord.asc_getHeight() + 3];
                 if (!Common.Utils.InternalSettings.get("de-hidden-rulers")) {
@@ -1121,17 +1136,59 @@ define([
                 }
                 pasteContainer.css({left: showPoint[0], top : showPoint[1]});
                 pasteContainer.show();
+                setTimeout(function() {
+                    $(document).on('keyup', me.wrapEvents.onKeyUp);
+                }, 10);
             }
         },
 
         onHideSpecialPasteOptions: function() {
             var pasteContainer = this.documentHolder.cmpEl.find('#special-paste-container');
-            if (pasteContainer.is(':visible'))
+            if (pasteContainer.is(':visible')) {
                 pasteContainer.hide();
+                $(document).off('keyup', this.wrapEvents.onKeyUp);
+            }
+        },
+
+        onKeyUp: function (e) {
+            if (e.keyCode == Common.UI.Keys.CTRL && this._needShowSpecPasteMenu && !this.btnSpecialPaste.menu.isVisible() && /area_id/.test(e.target.id)) {
+                $('button', this.btnSpecialPaste.cmpEl).click();
+                e.preventDefault();
+            }
+            this._needShowSpecPasteMenu = false;
+        },
+
+        initSpecialPasteEvents: function() {
+            var me = this;
+            me.hkSpecPaste = [];
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.paste] = 'P';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.sourceformatting] = 'K';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.keepTextOnly] = 'T';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.insertAsNestedTable] = 'N';
+            me.hkSpecPaste[Asc.c_oSpecialPasteProps.overwriteCells] = 'O';
+            for(var key in me.hkSpecPaste){
+                if(me.hkSpecPaste.hasOwnProperty(key)){
+                    var keymap = {};
+                    keymap[me.hkSpecPaste[key]] = _.bind(me.onSpecialPasteItemClick, me, {value: parseInt(key)});
+                    Common.util.Shortcuts.delegateShortcuts({shortcuts:keymap});
+                    Common.util.Shortcuts.suspendEvents(me.hkSpecPaste[key], undefined, true);
+                }
+            }
+
+            me.btnSpecialPaste.menu.on('show:after', function(menu) {
+                for (var i = 0; i < menu.items.length; i++) {
+                    me.hkSpecPaste[menu.items[i].value] && Common.util.Shortcuts.resumeEvents(me.hkSpecPaste[menu.items[i].value]);
+                }
+            }).on('hide:after', function(menu) {
+                for (var i = 0; i < menu.items.length; i++) {
+                    me.hkSpecPaste[menu.items[i].value] && Common.util.Shortcuts.suspendEvents(me.hkSpecPaste[menu.items[i].value], undefined, true);
+                }
+            });
         },
 
         onDoubleClickOnChart: function(chart) {
-            if (this.mode.isEdit && !this._isDisabled) {
+            var docProtection = this.documentHolder._docProtection;
+            if (this.mode.isEdit && !(this._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly)) {
                 var diagramEditor = this.getApplication().getController('Common.Controllers.ExternalDiagramEditor').getView('Common.Views.ExternalDiagramEditor');
                 if (diagramEditor && chart) {
                     diagramEditor.setEditMode(true);
@@ -1142,7 +1199,8 @@ define([
         },
 
         onDoubleClickOnTableOleObject: function(chart) {
-            if (this.mode.isEdit && !this._isDisabled) {
+            var docProtection = this.documentHolder._docProtection;
+            if (this.mode.isEdit && !(this._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly)) {
                 var oleEditor = this.getApplication().getController('Common.Controllers.ExternalOleEditor').getView('Common.Views.ExternalOleEditor');
                 if (oleEditor && chart) {
                     oleEditor.setEditMode(true);
@@ -1725,9 +1783,9 @@ define([
         onAcceptRejectChange: function(item, e) {
             if (this.api) {
                 if (item.value == 'accept')
-                    this.api.asc_AcceptChanges();
+                    this.api.asc_AcceptChangesBySelection(false);
                 else if (item.value == 'reject')
-                    this.api.asc_RejectChanges();
+                    this.api.asc_RejectChangesBySelection(false);
             }
             this.editComplete();
         },
@@ -1846,7 +1904,8 @@ define([
                     this.api.asc_ViewCertificate(datavalue); //certificate id
                     break;
                 case 2:
-                    Common.NotificationCenter.trigger('protect:signature', 'visible', this._isDisabled, datavalue);//guid, can edit settings for requested signature
+                    var docProtection = this.documentHolder._docProtection;
+                    Common.NotificationCenter.trigger('protect:signature', 'visible', this._isDisabled || docProtection.isReadOnly || docProtection.isFormsOnly || docProtection.isCommentsOnly, datavalue);//guid, can edit settings for requested signature
                     break;
                 case 3:
                     var me = this;
@@ -2183,7 +2242,7 @@ define([
         },
 
         onRefreshField: function(item, e){
-            this.api && this.api.asc_UpdateComplexField(item.options.fieldProps);
+            this.api && this.api.asc_UpdateFields(true);
             this.editComplete();
         },
 
@@ -2230,6 +2289,43 @@ define([
 
         onParaTOCSettings: function(item, e) {
             this.documentHolder.fireEvent('links:contents', [item.value, true]);
+        },
+
+        onSpecialPasteItemClick: function(item, e) {
+            if (this.api) {
+                this.api.asc_SpecialPaste(item.value);
+                var menu = this.btnSpecialPaste.menu;
+                if (!item.cmpEl) {
+                    for (var i = 0; i < menu.items.length; i++) {
+                        menu.items[i].setChecked(menu.items[i].value===item.value, true);
+                    }
+                }
+                setTimeout(function(){
+                    menu.hide();
+                }, 100);
+            }
+            return false;
+        },
+
+        convertEquation: function(menu, item, e) {
+            if (this.api) {
+                if (item.options.type=='input')
+                    this.api.asc_SetMathInputType(item.value);
+                else if (item.options.type=='view')
+                    this.api.asc_ConvertMathView(item.value.linear, item.value.all);
+                else if (item.options.type=='mode')
+                    this.api.asc_ConvertMathDisplayMode(item.checked);
+            }
+        },
+
+        onChangeProtectDocument: function(props) {
+            if (!props) {
+                var docprotect = this.getApplication().getController('DocProtection');
+                props = docprotect ? docprotect.getDocProps() : null;
+            }
+            if (props && this.documentHolder) {
+                this.documentHolder._docProtection = props;
+            }
         },
 
         editComplete: function() {

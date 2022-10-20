@@ -3,6 +3,7 @@
     "textAbout": "Quant a",
     "textAddress": "Adreça",
     "textBack": "Enrere",
+    "textEditor": "Editor de presentacions",
     "textEmail": "Correu electrònic",
     "textPoweredBy": "Amb tecnologia de",
     "textTel": "Tel",
@@ -11,8 +12,8 @@
   "Common": {
     "Collaboration": {
       "notcriticalErrorTitle": "Advertiment",
-      "textAddComment": "Afegeix un comentari",
-      "textAddReply": "Afegeix una resposta",
+      "textAddComment": "Afegir comentari",
+      "textAddReply": "Afegir Resposta",
       "textBack": "Enrere",
       "textCancel": "Cancel·la",
       "textCollaboration": "Col·laboració",
@@ -31,7 +32,8 @@
       "textReopen": "Torna a obrir",
       "textResolve": "Resol",
       "textTryUndoRedo": "S'han desactivat les funcions desfés/refés per al mode de coedició ràpida.",
-      "textUsers": "Usuaris"
+      "textUsers": "Usuaris",
+      "textSharingSettings": "Sharing Settings"
     },
     "HighlightColorPalette": {
       "textNoFill": "Sense emplenament"
@@ -44,9 +46,9 @@
   },
   "ContextMenu": {
     "errorCopyCutPaste": "Les accions de copiar, tallar i enganxar mitjançant el menú contextual només es realitzaran en el fitxer actual.",
-    "menuAddComment": "Afegeix un comentari",
-    "menuAddLink": "Afegeix un enllaç",
-    "menuCancel": "Cancel·la",
+    "menuAddComment": "Afegir comentari",
+    "menuAddLink": "Afegir Enllaç",
+    "menuCancel": "Cancel·lar",
     "menuDelete": "Suprimeix",
     "menuDeleteTable": "Suprimeix la taula",
     "menuEdit": "Edita",
@@ -58,7 +60,10 @@
     "textColumns": "Columnes",
     "textCopyCutPasteActions": "Accions de copiar, tallar i enganxar ",
     "textDoNotShowAgain": "No ho mostris més",
-    "textRows": "Files"
+    "textOk": "D'acord",
+    "textRows": "Files",
+    "txtWarnUrl": "Fer clic en aquest enllaç pot ser perjudicial per al dispositiu i les dades.<br>Esteu segur que voleu continuar?",
+    "menuEditLink": "Edit Link"
   },
   "Controller": {
     "Main": {
@@ -113,6 +118,7 @@
       "textRemember": "Recorda la meva elecció",
       "textReplaceSkipped": "S'ha realitzat la substitució. S'han omès {0} ocurrències.",
       "textReplaceSuccess": "S'ha fet la cerca. S'han substituït les coincidències: {0}",
+      "textRequestMacros": "Una macro fa una sol·licitud a l'URL. Voleu permetre la sol·licitud al %1?",
       "textYes": "Sí",
       "titleLicenseExp": "La llicència ha caducat",
       "titleServerVersion": "S'ha actualitzat l'editor",
@@ -126,8 +132,7 @@
       "warnLicenseUsersExceeded": "Heu arribat al límit d'usuari per a %1 editors. Contacteu amb l'administrador per a més informació.",
       "warnNoLicense": "Heu arribat al límit de connexions simultànies a %1 editors. Aquest document només s'obrirà en mode lectura. Contacteu amb l'equip de vendes %1 per conèixer les condicions d'actualització personal.",
       "warnNoLicenseUsers": "Heu arribat al límit d'usuaris per a %1 editors. Contacteu amb l'equip de vendes de %1 per obtenir les condicions de millora personals dels vostres serveis.",
-      "warnProcessRightsChange": "No teniu permís per editar el fitxer.",
-      "textRequestMacros": "A macro makes a request to URL. Do you want to allow the request to the %1?"
+      "warnProcessRightsChange": "No teniu permís per editar el fitxer."
     }
   },
   "Error": {
@@ -147,7 +152,7 @@
     "errorFileSizeExceed": "La mida del fitxer supera el límit del vostre servidor. <br>Contacteu amb l'administrador.",
     "errorKeyEncrypt": "Descriptor de claus desconegut",
     "errorKeyExpire": "El descriptor de claus ha caducat",
-    "errorLoadingFont": "No s'han carregat els tipus de lletra. <br>Contacteu amb l'administrador del servidor de documents.",
+    "errorLoadingFont": "No s'han carregat les lletres tipogràfiques.<br> Contacteu amb l'administrador del Servidor de Documents.",
     "errorSessionAbsolute": "La sessió d'edició del document ha caducat. Torneu a carregar la pàgina.",
     "errorSessionIdle": "Fa molt de temps que no s'edita el document. Torneu a carregar la pàgina.",
     "errorSessionToken": "S'ha interromput la connexió amb el servidor. Torneu a carregar la pàgina.",
@@ -166,7 +171,8 @@
     "unknownErrorText": "Error desconegut.",
     "uploadImageExtMessage": "Format d'imatge desconegut.",
     "uploadImageFileCountMessage": "No s'ha carregat cap imatge.",
-    "uploadImageSizeMessage": "La imatge és massa gran. La mida màxima és de 25 MB."
+    "uploadImageSizeMessage": "La imatge és massa gran. La mida màxima és de 25 MB.",
+    "errorDirectUrl": "Please verify the link to the document.<br>This link must be a direct link to the file for downloading."
   },
   "LongActions": {
     "applyChangesTextText": "S'estant carregant les dades...",
@@ -197,7 +203,10 @@
     "txtEditingMode": "Estableix el mode d'edició ...",
     "uploadImageTextText": "S'està carregant la imatge...",
     "uploadImageTitleText": "S'està carregant la imatge",
-    "waitText": "Espereu..."
+    "waitText": "Espereu...",
+    "confirmMaxChangesSize": "The size of actions exceeds the limitation set for your server.<br>Press \"Undo\" to cancel your last action or press \"Continue\" to keep action locally (you need to download the file or copy its content to make sure nothing is lost).",
+    "textUndo": "Undo",
+    "textContinue": "Continue"
   },
   "Toolbar": {
     "dlgLeaveMsgText": "Teniu canvis no desats en aquest document. Feu clic a \"Queda't en aquesta pàgina\" per esperar al desament automàtic. Feu clic a \"Deixa aquesta pàgina\" per descartar tots els canvis no desats.",
@@ -208,10 +217,10 @@
   "View": {
     "Add": {
       "notcriticalErrorTitle": "Advertiment",
-      "textAddLink": "Afegeix un enllaç",
+      "textAddLink": "Afegir Enllaç",
       "textAddress": "Adreça",
       "textBack": "Enrere",
-      "textCancel": "Cancel·la",
+      "textCancel": "Cancel·lar",
       "textColumns": "Columnes",
       "textComment": "Comentari",
       "textDefault": "Text seleccionat",
@@ -242,17 +251,20 @@
       "textSlideNumber": "Número de diapositiva",
       "textTable": "Taula",
       "textTableSize": "Mida de la taula",
-      "txtNotUrl": "Aquest camp hauria de ser un URL amb el format \"http://www.exemple.com\""
+      "txtNotUrl": "Aquest camp hauria de ser un URL amb el format \"http://www.exemple.com\"",
+      "textDone": "Done",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Edit": {
       "notcriticalErrorTitle": "Advertiment",
       "textActualSize": "Mida real",
-      "textAddCustomColor": "Afegeix un color personalitzat",
+      "textAddCustomColor": "Afegir Color Personalitzat",
       "textAdditional": "Addicional",
       "textAdditionalFormatting": "Format addicional",
       "textAddress": "Adreça",
       "textAfter": "Després",
-      "textAlign": "Alineació",
+      "textAlign": "Alinear",
       "textAlignBottom": "Alineació inferior",
       "textAlignCenter": "Alineació al centre",
       "textAlignLeft": "Alineació a l'esquerra",
@@ -308,9 +320,9 @@
       "textFindAndReplace": "Cerca i substitueix",
       "textFirstColumn": "Primera columna",
       "textFirstSlide": "Primera diapositiva",
-      "textFontColor": "Color del tipus de lletra",
-      "textFontColors": "Colors del tipus de lletra",
-      "textFonts": "Tipus de lletra",
+      "textFontColor": "Color de la lletra",
+      "textFontColors": "Colors de la lletra",
+      "textFonts": "Lletra",
       "textFromLibrary": "Imatge de la biblioteca",
       "textFromURL": "Imatge de l'URL",
       "textHeaderRow": "Fila de capçalera",
@@ -348,11 +360,8 @@
       "textPt": "pt",
       "textPush": "Inserció",
       "textRemoveChart": "Suprimeix el gràfic",
-      "textRemoveImage": "Suprimeix la imatge",
-      "textRemoveLink": "Suprimeix l'enllaç",
       "textRemoveShape": "Suprimeix la forma",
       "textRemoveTable": "Suprimeix la taula",
-      "textReorder": "Torna a ordenar",
       "textReplace": "Substitueix",
       "textReplaceAll": "Substitueix-ho tot ",
       "textReplaceImage": "Substitueix la imatge",
@@ -389,15 +398,24 @@
       "textVerticalIn": "Vertical entrant",
       "textVerticalOut": "Vertical sortint",
       "textWedge": "Falca",
-      "textWipe": "Elimina",
+      "textWipe": "Eliminar",
       "textZoom": "Zoom",
       "textZoomIn": "Amplia",
       "textZoomOut": "Redueix",
-      "textZoomRotate": "Amplia i gira"
+      "textZoomRotate": "Amplia i gira",
+      "textArrange": "Arrange",
+      "textCancel": "Cancel",
+      "textChangeShape": "Change Shape",
+      "textDeleteImage": "Delete Image",
+      "textDeleteLink": "Delete Link",
+      "textInsertImage": "Insert Image",
+      "textRecommended": "Recommended",
+      "textRequired": "Required"
     },
     "Settings": {
       "mniSlideStandard": "Estàndard (4:3)",
       "mniSlideWide": "Pantalla panoràmica (16:9)",
+      "notcriticalErrorTitle": "Advertiment",
       "textAbout": "Quant a",
       "textAddress": "adreça:",
       "textApplication": "Aplicació",
@@ -407,7 +425,7 @@
       "textCaseSensitive": "Sensible a majúscules i minúscules",
       "textCentimeter": "Centímetre",
       "textCollaboration": "Col·laboració",
-      "textColorSchemes": "Combinacions de colors",
+      "textColorSchemes": "Esquema de Color",
       "textComment": "Comentari",
       "textCreated": "S'ha creat",
       "textDarkTheme": "Tema fosc",
@@ -420,6 +438,7 @@
       "textEmail": "correu electrònic:",
       "textEnableAll": "Habilita-ho tot",
       "textEnableAllMacrosWithoutNotification": "Habilita totes les macros sense notificació",
+      "textFeedback": "Comentaris i servei d'atenció al client",
       "textFind": "Cerca",
       "textFindAndReplace": "Cerca i substitueix",
       "textFindAndReplaceAll": "Cerca i substitueix-ho tot",
@@ -432,6 +451,7 @@
       "textLocation": "Ubicació",
       "textMacrosSettings": "Configuració de les macros",
       "textNoTextFound": "No s'ha trobat el text",
+      "textOk": "D'acord",
       "textOwner": "Propietari",
       "textPoint": "Punt",
       "textPoweredBy": "Amb tecnologia de",
@@ -441,6 +461,8 @@
       "textPrint": "Imprimeix",
       "textReplace": "Substitueix",
       "textReplaceAll": "Substitueix-ho tot ",
+      "textRestartApplication": "Reinicieu l'aplicació perquè els canvis tinguin efecte.",
+      "textRTL": "De dreta a esquerra",
       "textSearch": "Cerca",
       "textSettings": "Configuració",
       "textShowNotification": "Mostra la notificació",
@@ -473,8 +495,7 @@
       "txtScheme6": "Esplanada",
       "txtScheme7": "Equitat",
       "txtScheme8": "Flux",
-      "txtScheme9": "Foneria",
-      "textFeedback": "Feedback & Support"
+      "txtScheme9": "Foneria"
     }
   }
 }
