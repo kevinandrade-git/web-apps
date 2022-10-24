@@ -1114,7 +1114,6 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 this._UpdateTableBordersStyle(ct, border, size, color, this.TableBorders, this.ChangedTableBorders);
             }, this);
 
-
             this.tableBordersImage.on('borderclick', function(ct, border, size, color){
                 if (this._allTable) {
                     if (this.ChangedTableBorders===undefined) {
@@ -1125,13 +1124,24 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                         this.ChangedCellBorders = new Asc.CBorders();
                     }
                 }
-                this._UpdateCellBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
+                //this._UpdateCellBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
                 this._UpdateTableBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
 
             }, this);
+            this.tableBordersImage.on('borderclick:cellborder', function(ct, border, size, color){
+                if (this._allTable) {
+                    if (this.ChangedTableBorders===undefined) {
+                        this.ChangedTableBorders = new Asc.CBorders();
+                    }
+                } else {
+                    if (this.ChangedCellBorders===undefined) {
+                        this.ChangedCellBorders = new Asc.CBorders();
+                    }
+                }
+                this._UpdateCellBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
+                //this._UpdateTableBordersStyle(ct, border, size, color, (this._allTable) ? this.TableBorders : this.CellBorders, (this._allTable) ? this.ChangedTableBorders : this.ChangedCellBorders);
 
-
-
+            }, this);
 
             if (this.storageName) {
                 var value = Common.localStorage.getItem(this.storageName);
@@ -1737,10 +1747,10 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
             }
             var colorstr = (typeof(color) == 'object') ? color.color : color;
             this.tableBordersImageSpacing.setCellsColor(colorstr);
-            if (!this._allTable)
+            if (!this._allTable) {
                 this.tableBordersImage.setCellsColor(colorstr);
-
-
+                this.tableBordersImage.redrawTable();
+            }
         },
 
         onColorsTableBackSelect: function(btn, color) {
@@ -1795,7 +1805,7 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
 
             if (source.get_InsideV() !== null) {
                 for (i=0; i<this.tableBordersImageSpacing.columns-1; i++) {
-                    this._UpdateCellBorderSpacing_(source.get_InsideV(),  this.tableBordersImageSpacing.getBorder(-1, -i));
+                    this._UpdateCellBorderSpacing_(source.get_InsideV(),  this.tableBordersImageSpacing.getBorder(-1, i));
                 }
             }
 
@@ -1828,8 +1838,8 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 }
             }
             else {
-                cell.setBordersSize(borderName, this.IndeterminateSize);
-                cell.setBordersColor(borderName, this.IndeterminateColor);
+                cell.setBordersSize(this.IndeterminateSize);
+                cell.setBordersColor(this.IndeterminateColor);
             }
         },
 
@@ -1867,8 +1877,9 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 source.put_InsideV(new Asc.asc_CTextBorder());
             }
             if (source.get_InsideV() !== null) {
-                for (var i=0; i<this.tableBordersImage.rows-1; i++) {
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideV(),  this.tableBordersImage.getBorder(i, -1));
+                for (var i=0; i<this.tableBordersImage.columns-1; i++) {
+                    var n = this.tableBordersImage.getBorder(-1, i);
+                    this._UpdateCellBorderNoSpacing_(source.get_InsideV(),  this.tableBordersImage.getBorder(-1, i));
                 }
             }
 
@@ -1876,9 +1887,10 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 source.put_InsideH(new Asc.asc_CTextBorder());
             }
             if (source.get_InsideH() !== null) {
-                for (i=0; i<this.tableBordersImage.columns-1; i++) {
-                    this._UpdateCellBorderNoSpacing_(source.get_InsideH(),  this.tableBordersImage.getBorder(-1, i));
+                for (i=0; i<this.tableBordersImage.rows-1; i++) {
+                    this._UpdateCellBorderNoSpacing_(source.get_InsideH(),  this.tableBordersImage.getBorder(i, -1));
                 }
+
             }
 
             this.tableBordersImage.setVirtualBorderSize(oldSize.pxValue);
@@ -1985,43 +1997,13 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
 
         _UpdateCellBordersStyle: function(ct, border, size, color, destination, changed_destination) {
             var updateBorders = destination;
-
-            if ( ct.col==0 && border.indexOf('l') > -1 ) {
-                this._UpdateBorderStyle(updateBorders.get_Left(), (size>0));
-                if (changed_destination) {
-                    changed_destination.put_Left(new Asc.asc_CTextBorder(updateBorders.get_Left()));
-                }
-            }
-
-            if ( ct.col== this.tableStylerColumns-1 && border.indexOf('r') > -1 ) {
-                this._UpdateBorderStyle(updateBorders.get_Right(), (size>0));
-                if (changed_destination) {
-                    changed_destination.put_Right(new Asc.asc_CTextBorder(updateBorders.get_Right()));
-                }
-            }
-
-            if ( ct.row==0 && border.indexOf('t') > -1 ) {
-                this._UpdateBorderStyle(updateBorders.get_Top(), (size>0));
-                if (changed_destination) {
-                    changed_destination.put_Top(new Asc.asc_CTextBorder(updateBorders.get_Top()));
-                }
-            }
-
-            if ( ct.row== this.tableStylerRows-1 && border.indexOf('b') > -1 )  {
-                this._UpdateBorderStyle(updateBorders.get_Bottom(), (size>0));
-                if (changed_destination)  {
-                    changed_destination.put_Bottom(new Asc.asc_CTextBorder(updateBorders.get_Bottom()));
-                }
-            }
-
-            if ( ct.col==0 && border.indexOf('r') > -1 || ct.col== this.tableStylerColumns-1 && border.indexOf('l') > -1) {
+            if ( border.col > -1 ) {
                 this._UpdateBorderStyle(updateBorders.get_InsideV(), (size>0));
                 if (changed_destination)  {
                     changed_destination.put_InsideV(new Asc.asc_CTextBorder(updateBorders.get_InsideV()));
                 }
             }
-
-            if ( ct.row==0 && border.indexOf('b') > -1 || ct.row== this.tableStylerRows-1 && border.indexOf('t') > -1) {
+            if ( border.row > -1 ) {
                 this._UpdateBorderStyle(updateBorders.get_InsideH(), (size>0));
                 if (changed_destination)  {
                     changed_destination.put_InsideH(new Asc.asc_CTextBorder(updateBorders.get_InsideH()));
@@ -2037,20 +2019,17 @@ define([    'text!documenteditor/main/app/template/TableSettingsAdvanced.templat
                 if (changed_destination) {
                     changed_destination.put_Left(new Asc.asc_CTextBorder(updateBorders.get_Left()));
                 }
-            }
-            if (border.indexOf('t') > -1) {
+            }else if (border.indexOf('t') > -1) {
                 this._UpdateBorderStyle(updateBorders.get_Top(), (size>0));
                 if (changed_destination) {
                     changed_destination.put_Top(new Asc.asc_CTextBorder(updateBorders.get_Top()));
                 }
-            }
-            if (border.indexOf('r') > -1) {
+            }else if (border.indexOf('r') > -1) {
                 this._UpdateBorderStyle(updateBorders.get_Right(), (size>0));
                 if (changed_destination) {
                     changed_destination.put_Right(new Asc.asc_CTextBorder(updateBorders.get_Right()));
                 }
-            }
-            if (border.indexOf('b') > -1) {
+            }else if (border.indexOf('b') > -1) {
                 this._UpdateBorderStyle(updateBorders.get_Bottom(), (size>0));
                 if (changed_destination)  {
                     changed_destination.put_Bottom(new Asc.asc_CTextBorder(updateBorders.get_Bottom()));

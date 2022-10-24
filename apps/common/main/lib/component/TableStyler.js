@@ -53,6 +53,7 @@ define([
             x2                  : 0,
             y2                  : 0,
             scale               : 2,
+            numInCell           : -1,
             sizeCorner          : 10,
             clickOffset         : 10,
             overwriteStyle      : true,
@@ -85,6 +86,7 @@ define([
         me.Y1                   = me.options.y1;
         me.X2                   = me.options.x2;
         me.Y2                   = me.options.y2;
+        me.numInCell            = me.options.numInCell;
         me.scale                = me.options.scale;
         me.context              = me.options.context;
         me.diff                 = 0.5 * me.scale;
@@ -273,21 +275,26 @@ define([
                     if (me.inRect('t', mouseX, mouseY)) {
                         me.setBorderParams('t');
                         redraw = true;
+                        me.fireEvent('borderclick', me, 't',  borderSize.top, borderColor.top.toHex());
                     } else if (me.inRect('b', mouseX, mouseY)) {
                         me.setBorderParams('b');
                         redraw = true;
+                        me.fireEvent('borderclick', me, 'b',  borderSize.bottom, borderColor.bottom.toHex());
                     } else if (me.inRect('l', mouseX, mouseY)) {
                         me.setBorderParams('l');
                         redraw = true;
+                        me.fireEvent('borderclick', me, 'l',  borderSize.left, borderColor.left.toHex());
                     } else if (me.inRect('r', mouseX, mouseY)) {
                         me.setBorderParams('r');
                         redraw = true;
+                        me.fireEvent('borderclick', me, 'r',  borderSize.right, borderColor.right.toHex());
                     } else {
                         for (var i = 0; i < me._borders.length; i++) {
                             if (me._borders[i].inRect(mouseX, mouseY)) {
                                 me._borders[i].setBorderParams();
                                 redraw = true;
-                                me.fireEvent('borderclick:cellborder', me,  borderSize, borderColor.top.toHex());
+                                me.fireEvent('borderclick:cellborder', me, me._borders[i],  me._borders[i].getBorderSize(), me._borders[i].getBorderColor());
+                                redraw = true;
                             }
                         }
                     }
@@ -364,7 +371,7 @@ define([
                 }
             };
 
-            me.setBordersSize = function(borders, size, noScale){
+            me.setBordersSize = function(borders, size){
                 size = (size > me.maxBorderSize) ? me.maxBorderSize : size;
                 if (borders.indexOf('t') > -1) {
                     borderSize.top = size;
@@ -515,40 +522,48 @@ define([
             }
             me.canv = $('#' + me.id + '-table-canvas')[0];
             me.context = me.canv.getContext('2d');
-            var sizeCorner = me.sizeCorner * me.scale;
+            var sizeCorner = me.sizeCorner * me.scale
+            sizeCorner += (me.spacingMode) ? me.cellPadding : 0;
             if (!me.rendered) {
                 this._borders = [];
-                var  cellBorder, opt;
                 var ctxWidth = me.width*me.scale,
                     ctxHeight = me.height*me.scale,
                     stepX = (ctxWidth - 2 * sizeCorner)/me.columns,
-                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows;
+                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows,
+                    opt,cellBorder;
 
                 var generalOpt = {
                     scale   : me.scale,
                     context : me.context
                 };
-                for (var row = 0; row < me.rows - 1; row++) {
+                /*me.createHorizontlBorders(generalOpt, sizeCorner);
+                me.createVerticaLBorders(generalOpt, sizeCorner);*/
+                //horizontal
+               /*for (var row = 0; row < me.rows - 1; row++) {
                     opt = generalOpt;
                     opt.y1 = (row + 1) * stepY + sizeCorner;
                     opt.y2 = opt.y1;
                     opt.x1 = sizeCorner;
                     opt.x2 = ctxWidth - sizeCorner;
                     opt.row = row;
+                    opt.col = -1;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
-                }
-
-                for (var col = 0; col < me.columns - 1; col++) {
+                }*/
+                me.createHorizontlBorders(generalOpt, sizeCorner);
+                me.createVerticaLBorders(generalOpt, sizeCorner);
+                //vertical
+                /*for (var col = 0; col < me.columns - 1; col++) {
                     opt = generalOpt;
                     opt.y1 = sizeCorner;
                     opt.y2 = ctxHeight - sizeCorner;
                     opt.x1 = (col + 1) * stepX + sizeCorner;
                     opt.x2 = opt.x1;
+                    opt.row = -1;
                     opt.col = col;
                     cellBorder = new Common.UI.CellBorder(opt);
                     this._borders.push(cellBorder);
-                }
+                }*/
                 this.drawTable();
             }
 
@@ -557,6 +572,84 @@ define([
             this.trigger('render:after', this);
 
             return this;
+        },
+
+        createHorizontlBorders: function (generalOpt, sizeCorner){
+            var me = this;
+            var opt = generalOpt;
+            var ctxWidth = me.width*me.scale,
+                stepY = (me.height*me.scale - 2 * sizeCorner)/me.rows;
+            if(!me.spacingMode) {
+                for (var row = 0; row < me.rows - 1; row++) {
+                    opt.y1 = (row + 1) * stepY + sizeCorner;
+                    opt.y2 = opt.y1;
+                    opt.x1 = sizeCorner;
+                    opt.x2 = ctxWidth - sizeCorner;
+                    opt.row = row;
+                    opt.col = -1;
+                    this._borders.push(new Common.UI.CellBorder(opt));
+                }
+            } else {
+                var y;
+
+                for (var row = 0; row < me.rows - 1; row++) {
+                    for (var n = 0; n < 2; n++) {
+
+                        if (n == 0) {
+                            y = (row) * (stepY + me.cellPadding / 2) + sizeCorner;
+                        } else {
+                            y = me.height*me.scale - sizeCorner - (me.rows - row - 1) * (stepY + me.cellPadding / 2);
+                        }
+
+                        opt.y1 = (row + 1) * stepY + sizeCorner;
+                        opt.y2 = opt.y1;
+                        opt.x1 = sizeCorner;
+                        opt.x2 = ctxWidth - sizeCorner;
+                        opt.row = row;
+                        opt.col = -1;
+                        this._borders.push(new Common.UI.CellBorder(opt));
+                    }
+                }
+
+            }
+        },
+
+        createVerticaLBorders: function (generalOpt, sizeCorner){
+            var me = this;
+            var opt = generalOpt;
+            var ctxHeight = me.height*me.scale,
+                stepX = (me.width * me.scale - 2 * sizeCorner)/me.columns;
+            if(!me.spacingMode) {
+                for (var col = 0; col < me.columns - 1; col++) {
+                    opt.y1 = sizeCorner;
+                    opt.y2 = ctxHeight - sizeCorner;
+                    opt.x1 = (col + 1) * stepX + sizeCorner;
+                    opt.x2 = opt.x1;
+                    opt.row = -1;
+                    opt.col = col;
+                    this._borders.push(new Common.UI.CellBorder(opt));
+                }
+            } else {
+                var x;
+                for (var col = 0; col < me.columns - 1; col++) {
+                    for (var n = 0; n < 2; n++) {
+
+                        if (n == 0) {
+                            x = (col) * (stepX + me.cellPadding / 2) + sizeCorner;
+                        } else {
+                            x = me.width*me.scale - sizeCorner - (me.columns - col - 1) * (stepX + me.cellPadding / 2);
+                        }
+
+                        opt.y1 = sizeCorner;
+                        opt.y2 = ctxHeight - sizeCorner;
+                        opt.x1 = x;
+                        opt.x2 = opt.x1;
+                        opt.col = col;
+                        opt.row = -1;
+                        this._borders.push(new Common.UI.CellBorder(opt));
+                    }
+                }
+            }
         },
 
         drawCorners: function () {
@@ -717,15 +810,17 @@ define([
             me.fillWithLines();
             me.context.lineWidth = 0;
 
-
             me._borders.forEach(function (item){item.drawBorder();});
         },
 
-        getBorder: function(row, col){
+        getBorder: function(row, col, numInCell){
+            numInCell = (numInCell == undefined) ? -1 : numInCell;
             if(col<0)
-                return _.findWhere(this._borders, { row:  row});
-            else
-                return _.findWhere(this._borders, {col:  col});
+                return _.findWhere(this._borders, {row: row, numInCell: numInCell});
+            else {
+                var n = _.findWhere(this._borders, {col: col, numInCell: numInCell});
+                return _.findWhere(this._borders, {col: col, numInCell: numInCell});
+            }
         },
 
         fillWithLines: function (){
@@ -763,8 +858,6 @@ define([
             me.context.stroke();
             me.context.setLineDash([])
         },
-
-
 
         redrawTable: function() {
             var me = this;

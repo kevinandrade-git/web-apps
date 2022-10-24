@@ -203,6 +203,7 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
                 allowAuto   : true,
                 autoText    : this.txtAutoText
             });
+
             this.numSpacingBefore.on('change', _.bind(function (field, newValue, oldValue, eOpts) {
                 if (this.Spacing === null) {
                     var properties = (this._originalProps) ? this._originalProps : new Asc.asc_CParagraphProperty();
@@ -1241,42 +1242,10 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
 
         _UpdateCellBordersStyle: function(ct, border, size, color, destination) {
             var updateBorders = destination;
-
-            /*if ( ct.col==0 && border.indexOf('l') > -1 ) {
-                updateBorders.put_Left(this._UpdateBorderStyle(updateBorders.get_Left(), (size>0)));
-                if (this.ChangedBorders) {
-                    this.ChangedBorders.put_Left(new Asc.asc_CTextBorder(updateBorders.get_Left()));
-                }
+            updateBorders.put_Between(this._UpdateBorderStyle(updateBorders.get_Between(), (size>0)));
+            if (this.ChangedBorders) {
+                this.ChangedBorders.put_Between(new Asc.asc_CTextBorder(updateBorders.get_Between()));
             }
-
-            if ( ct.col== this.tableStylerColumns-1 && border.indexOf('r') > -1 )  {
-                updateBorders.put_Right(this._UpdateBorderStyle(updateBorders.get_Right(), (size>0)));
-                if (this.ChangedBorders) {
-                    this.ChangedBorders.put_Right(new Asc.asc_CTextBorder(updateBorders.get_Right()));
-                }
-            }
-
-            if ( ct.row==0 && border.indexOf('t') > -1 ) {
-                updateBorders.put_Top(this._UpdateBorderStyle(updateBorders.get_Top(), (size>0)));
-                if (this.ChangedBorders) {
-                    this.ChangedBorders.put_Top(new Asc.asc_CTextBorder(updateBorders.get_Top()));
-                }
-            }
-
-            if ( ct.row== this.tableStylerRows-1 && border.indexOf('b') > -1 ) {
-                updateBorders.put_Bottom(this._UpdateBorderStyle(updateBorders.get_Bottom(), (size>0)));
-                if (this.ChangedBorders) {
-                    this.ChangedBorders.put_Bottom(new Asc.asc_CTextBorder(updateBorders.get_Bottom()));
-                }
-            }
-
-            if ( ct.row==0 && border.indexOf('b') > -1 ||
-                ct.row== this.tableStylerRows-1 && border.indexOf('t') > -1) {
-                updateBorders.put_Between(this._UpdateBorderStyle(updateBorders.get_Between(), (size>0)));
-                if (this.ChangedBorders) {
-                    this.ChangedBorders.put_Between(new Asc.asc_CTextBorder(updateBorders.get_Between()));
-                }
-            }*/
         },
 
         _UpdateTableBordersStyle: function(ct, border, size, color, destination) {
@@ -1327,16 +1296,16 @@ define([    'text!documenteditor/main/app/template/ParagraphSettingsAdvanced.tem
             this.BordersImage.redrawTable();
         },
 
-        _UpdateCellBorder: function(BorderParam,  cellBorder){
+        _UpdateCellBorder: function(BorderParam,  betweenBorder){
             if (null !== BorderParam && undefined !== BorderParam){
                 if (null !== BorderParam.get_Value() && null !== BorderParam.get_Size() && null !== BorderParam.get_Color() && 1 == BorderParam.get_Value()){
-                    cellBorder.setBordersSize( this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
-                    cellBorder.setBordersColor(new Common.Utils.RGBColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')'));
+                    betweenBorder.setBordersSize( this._BorderPt2Px(BorderParam.get_Size() * 72 / 25.4));
+                    betweenBorder.setBordersColor(new Common.Utils.RGBColor('rgb(' + BorderParam.get_Color().get_r() + ',' + BorderParam.get_Color().get_g() + ',' + BorderParam.get_Color().get_b() + ')'));
                 } else
-                    cellBorder.setBordersSize( 0);
+                    betweenBorder.setBordersSize( 0);
             }
             else {
-                cellBorder.setBordersSize( 0);
+                betweenBorder.setBordersSize( 0);
             }
         },
 
