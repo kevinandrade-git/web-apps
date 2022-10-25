@@ -310,7 +310,7 @@ define([
                 me.context.clearRect(0,0, me.width*me.scale, me.height*me.scale);
 
                 me.scale = Common.Utils.applicationPixelRatio();
-                me._borders.forEach(function(b,index){
+                me._borders.forEach(function(b){
                     b.scale = me.scale;
                 });
 
@@ -526,51 +526,19 @@ define([
             sizeCorner += (me.spacingMode) ? me.cellPadding : 0;
             if (!me.rendered) {
                 this._borders = [];
-                var ctxWidth = me.width*me.scale,
-                    ctxHeight = me.height*me.scale,
-                    stepX = (ctxWidth - 2 * sizeCorner)/me.columns,
-                    stepY = (ctxHeight - 2 * sizeCorner)/me.rows,
-                    opt,cellBorder;
-
                 var generalOpt = {
                     scale   : me.scale,
                     context : me.context
                 };
-                /*me.createHorizontlBorders(generalOpt, sizeCorner);
-                me.createVerticaLBorders(generalOpt, sizeCorner);*/
-                //horizontal
-               /*for (var row = 0; row < me.rows - 1; row++) {
-                    opt = generalOpt;
-                    opt.y1 = (row + 1) * stepY + sizeCorner;
-                    opt.y2 = opt.y1;
-                    opt.x1 = sizeCorner;
-                    opt.x2 = ctxWidth - sizeCorner;
-                    opt.row = row;
-                    opt.col = -1;
-                    cellBorder = new Common.UI.CellBorder(opt);
-                    this._borders.push(cellBorder);
-                }*/
                 me.createHorizontlBorders(generalOpt, sizeCorner);
                 me.createVerticaLBorders(generalOpt, sizeCorner);
-                //vertical
-                /*for (var col = 0; col < me.columns - 1; col++) {
-                    opt = generalOpt;
-                    opt.y1 = sizeCorner;
-                    opt.y2 = ctxHeight - sizeCorner;
-                    opt.x1 = (col + 1) * stepX + sizeCorner;
-                    opt.x2 = opt.x1;
-                    opt.row = -1;
-                    opt.col = col;
-                    cellBorder = new Common.UI.CellBorder(opt);
-                    this._borders.push(cellBorder);
-                }*/
+
                 this.drawTable();
             }
 
             me.rendered = true;
 
             this.trigger('render:after', this);
-
             return this;
         },
 
@@ -661,7 +629,6 @@ define([
 
             me.context.lineJoin = 'meter';
             var diff = connerLineSize/2;
-            //var sizeCornerScaleDiff = sizeCornerScale+connerLineSize/2;
 
             me.context.beginPath();
             me.context.setLineDash([connerLineSize,connerLineSize]);
@@ -817,10 +784,8 @@ define([
             numInCell = (numInCell == undefined) ? -1 : numInCell;
             if(col<0)
                 return _.findWhere(this._borders, {row: row, numInCell: numInCell});
-            else {
-                var n = _.findWhere(this._borders, {col: col, numInCell: numInCell});
+            else
                 return _.findWhere(this._borders, {col: col, numInCell: numInCell});
-            }
         },
 
         fillWithLines: function (){
@@ -830,19 +795,25 @@ define([
                 tdHeight = (me.height - 2 * me.sizeCorner)/me.rows,
                 tdX, tdY = me.sizeCorner, xLeft = me.sizeCorner;
 
-            var x1,w,y1,h;
+            var x1,w,y1,h, spaceL, spaceR, spaceT = tdPadding + me.getBorderSize('t'), spaceB;
 
             me.context.beginPath();
 
             for (var row = 0; row < me.rows; row++) {
 
                 tdX = xLeft;
+                spaceL = tdPadding + me.getBorderSize('l');
+                spaceB = (row < me.rows-1) ?
+                    tdPadding + me.getBorder( row, -1).getBorderSize()/(2*me.scale) :
+                    tdPadding + me.getBorderSize('t');
                 for (var col = 0; col < me.columns; col++) {
-
-                    x1 = ((tdX + tdPadding) * me.scale)>>0;
-                    y1 = (tdY + tdPadding) * me.scale;
-                    w = ((tdWidth - 2 * tdPadding) * me.scale + 0.5)>>0 ;
-                    h = (tdHeight - 2 * tdPadding) * me.scale;
+                    spaceR = (col < me.columns-1) ?
+                        tdPadding + me.getBorder(-1, col).getBorderSize()/(2*me.scale) :
+                        tdPadding + me.getBorderSize('r');
+                    x1 = ((tdX + spaceL) * me.scale)>>0;
+                    y1 = (tdY + spaceT) * me.scale;
+                    w = ((tdWidth - spaceL - spaceR) * me.scale + 0.5)>>0 ;
+                    h = (tdHeight - spaceT - spaceB) * me.scale;
 
                     me.context.setLineDash([(2 * me.scale + 0.5) >> 0, (2 * me.scale + 0.5) >> 0]);
                     me.context.strokeStyle = "#c0c0c0";
@@ -851,8 +822,10 @@ define([
                     me.context.lineTo(x1 + w / 2, (y1 + h) >> 0);
 
                     tdX += tdWidth;
+                    spaceL = spaceR;
                 }
                 tdY += tdHeight;
+                spaceT = spaceB;
             }
 
             me.context.stroke();
